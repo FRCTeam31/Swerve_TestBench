@@ -11,8 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.Joystick;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -32,6 +31,7 @@ public class Robot extends TimedRobot {
   private CANSparkMax Spark;
   private Solenoid Solenoid1;
   private Solenoid Solenoid2;
+  private Joystick Joystick1;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -44,6 +44,7 @@ public class Robot extends TimedRobot {
     Spark = new CANSparkMax(Spark1Id, MotorType.kBrushed);
     Solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, Solenoid1Id);
     Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, Solenoid2Id);
+    Joystick1 = new Joystick(0);
   }
 
   /**
@@ -67,15 +68,11 @@ public class Robot extends TimedRobot {
    * chooser code above as well.
    */
   @Override
-  public void autonomousInit() {
-    
-  }
+  public void autonomousInit() {}
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    
-  }
+  public void autonomousPeriodic() {}
 
   /** This function is called once when teleop is enabled. */
   @Override

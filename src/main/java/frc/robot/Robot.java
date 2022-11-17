@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
     Spark = new CANSparkMax(Spark1Id, MotorType.kBrushed);
     Solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, Solenoid1Id);
     Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, Solenoid2Id);
-    Joystick1 = new Joystick(0);
+    Joystick1 = new Joystick(1);
   }
 
   /**

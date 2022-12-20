@@ -13,8 +13,8 @@ public class PrimeSwerveDriveTrain {
   public static final double kMaxSpeed = 4.572; // in meters per second, 15 feet per second
   public static final double kMaxAngularSpeed = Math.PI; // 180 degrees per second, half rotation
 
-  public static final PidConstants drivePidConstants = new PidConstants(1, 0, 0);
-  public static final PidConstants steeringPidConstants = new PidConstants(1, 0, 0);
+  public static final PidConstants kDrivePidConstants = new PidConstants(1, 0, 0);
+  public static final PidConstants kSteeringPidConstants = new PidConstants(1, 0, 0);
 
   final Translation2d frontLeftLocation = new Translation2d(1, 1);  // using 1's right now for ease of testing
   final Translation2d frontRightLocation = new Translation2d(1, -1);
@@ -25,12 +25,9 @@ public class PrimeSwerveDriveTrain {
     RobotMap.kFalcon1Id, 
     RobotMap.kTalon1Id, 
     RobotMap.kEncoder1AIOChannel, 
-    RobotMap.kEncoderBasePositionOffset,
-    drivePidConstants,
-    steeringPidConstants);
+    RobotMap.kEncoderBasePositionOffset);
 
   final AHRS m_gyro = new AHRS(Port.kUSB);
-
   final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, rearLeftLocation, rearRightLocation);
 
   public PrimeSwerveDriveTrain() {

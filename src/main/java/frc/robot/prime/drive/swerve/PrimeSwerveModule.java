@@ -9,30 +9,24 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import frc.robot.prime.models.PidConstants;
 import frc.robot.sensors.MA3Encoder;
 
 public class PrimeSwerveModule {
+  static final short kEncoderResolution = 4096;
   static final double kWheelRadius = 5d;
-
   static final double kMaxAngularSpeed = PrimeSwerveDriveTrain.kMaxAngularSpeed;
   static final double kModuleMaxAngularAcceleration = 2 * Math.PI; // in radians per second squared
 
   final TalonSRX m_steeringMotor;
   final WPI_TalonFX m_driveMotor;
-
-  static final short kEncoderResolution = 4096;
   final MA3Encoder m_encoder;
-
   final ProfiledPIDController m_steeringPIDController;
 
   public PrimeSwerveModule(
     byte driveMotorId,
     byte steeringMotorId,
     byte encoderAioChannel,
-    short encoderBasePositionOffset,
-    PidConstants drivePidConstants,
-    PidConstants steeringPidConstants
+    short encoderBasePositionOffset
   ) {
     // Set up the steering motor
     m_steeringMotor = new TalonSRX(steeringMotorId);
@@ -43,9 +37,9 @@ public class PrimeSwerveModule {
     m_driveMotor = new WPI_TalonFX(driveMotorId);
     m_driveMotor.setNeutralMode(NeutralMode.Coast);
     m_driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor); // The integrated sensor in the Falcon is the falcon's encoder
-    m_driveMotor.config_kP(0, drivePidConstants.kP);
-    m_driveMotor.config_kI(0, drivePidConstants.kI);
-    m_driveMotor.config_kD(0, drivePidConstants.kD);
+    m_driveMotor.config_kP(0, PrimeSwerveDriveTrain.kDrivePidConstants.kP);
+    m_driveMotor.config_kI(0, PrimeSwerveDriveTrain.kDrivePidConstants.kI);
+    m_driveMotor.config_kD(0, PrimeSwerveDriveTrain.kDrivePidConstants.kD);
     m_driveMotor.configOpenloopRamp(0.1);
 
     // Set up our encoder
@@ -53,9 +47,9 @@ public class PrimeSwerveModule {
 
     // Create a PID controller to calculate steering motor output
     m_steeringPIDController = new ProfiledPIDController(
-      steeringPidConstants.kP, 
-      steeringPidConstants.kI, 
-      steeringPidConstants.kD, 
+      PrimeSwerveDriveTrain.kSteeringPidConstants.kP, 
+      PrimeSwerveDriveTrain.kSteeringPidConstants.kI, 
+      PrimeSwerveDriveTrain.kSteeringPidConstants.kD, 
       new TrapezoidProfile.Constraints(kMaxAngularSpeed, kModuleMaxAngularAcceleration));
   }
 

@@ -27,12 +27,13 @@ public class Robot extends TimedRobot {
   }
 
   private void driveWithJoystick(boolean fieldRelative) {
+    // Grab the X and Y axis from the left joystick on the controller
     var strafeX = MathUtil.applyDeadband(m_controller.getLeftX(), kJoystickDeadband);
     var forwardY = MathUtil.applyDeadband(m_controller.getLeftY(), kJoystickDeadband);
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
-    var rotation = MathUtil.applyDeadband(
-      (-m_controller.getLeftTriggerAxis() + m_controller.getRightTriggerAxis()), // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
+    // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
+    var rotation = MathUtil.applyDeadband((-m_controller.getLeftTriggerAxis() + m_controller.getRightTriggerAxis()),
       kJoystickDeadband);
 
     m_swerve.drive(strafeX, forwardY, rotation, fieldRelative);

@@ -13,20 +13,26 @@ public class PrimeSwerveDriveTrain {
   public static final double kMaxSpeed = 4.572; // in meters per second, 15 feet per second
   public static final double kMaxAngularSpeed = Math.PI; // 180 degrees per second, half rotation
 
+  // Default PID values for steering each module and driving each module
   public static final PidConstants kDrivePidConstants = new PidConstants(1, 0, 0);
   public static final PidConstants kSteeringPidConstants = new PidConstants(1, 0, 0);
 
+  // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
   final Translation2d frontLeftLocation = new Translation2d(1, 1);  // using 1's right now for ease of testing
   final Translation2d frontRightLocation = new Translation2d(1, -1);
   final Translation2d rearLeftLocation = new Translation2d(-1, 1);
   final Translation2d rearRightLocation = new Translation2d(-1, -1);
 
+  // Build serve drive modules with encoder channel & offset, and CAN IDs for drive and steering motors
   final PrimeSwerveModule m_frontLeftModule = new PrimeSwerveModule(
     RobotMap.kFalcon1Id, 
     RobotMap.kTalon1Id, 
     RobotMap.kEncoder1AIOChannel, 
     RobotMap.kEncoderBasePositionOffset);
 
+  // TODO: Build the other 3 swerve modules
+
+  // Build a gyro and a kinematics class for our drive
   final AHRS m_gyro = new AHRS(Port.kUSB);
   final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, rearLeftLocation, rearRightLocation);
 
@@ -35,11 +41,11 @@ public class PrimeSwerveDriveTrain {
   }
 
   public void drive(double str, double fwd, double rot, boolean fieldRelative) {
-    var chassisSpeeds = fieldRelative
+    var desiredChassisSpeeds = fieldRelative
       ? ChassisSpeeds.fromFieldRelativeSpeeds(str, fwd, rot, m_gyro.getRotation2d())
       : new ChassisSpeeds(str, fwd, rot);
 
-    var swerveModuleStates = m_kinematics.toSwerveModuleStates(chassisSpeeds);
+    var swerveModuleStates = m_kinematics.toSwerveModuleStates(desiredChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
     m_frontLeftModule.setDesiredState(swerveModuleStates[0]);

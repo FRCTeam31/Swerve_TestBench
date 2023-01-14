@@ -25,10 +25,10 @@ public class PrimeSwerveDriveTrain {
 
   // Build serve drive modules with encoder channel & offset, and CAN IDs for drive and steering motors
   final PrimeSwerveModule m_frontLeftModule = new PrimeSwerveModule(
-    RobotMap.kFalcon1Id, 
-    RobotMap.kTalon1Id, 
-    RobotMap.kEncoder1AIOChannel, 
-    RobotMap.kEncoderBasePositionOffset);
+    RobotMap.TALAON2_CAN_ID, 
+    RobotMap.TALON1_CAN_ID, 
+    RobotMap.FALCON1_CAN_ID, 
+    RobotMap.SPARK1_CAN_ID);
 
   // TODO: Build the other 3 swerve modules
 

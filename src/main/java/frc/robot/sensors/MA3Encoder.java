@@ -14,7 +14,7 @@ public class MA3Encoder extends AnalogInput {
 
     @Override
     public int getValue() {
-        return super.getValue() - BasePositionOffset;
+        return super.getValue() + BasePositionOffset;
     }
     
     public double getAngle() {

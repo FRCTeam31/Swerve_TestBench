@@ -1,6 +1,10 @@
 package frc.robot.config;
 
 public class RobotMap {
+  public static final double kRobotTrackWidthInches = 24.5;
+  public static final double kRobotTrackWidthMeters = 0.6223;
+  public static final double kRobotWheelBaseInches = 24;
+  public static final double kRobotWheelBaseMeters = 0.6096;
 
   // Motor CAN Id Constants
   public static final  byte TALON1_CAN_ID = 3;
@@ -31,25 +35,28 @@ public class RobotMap {
   public static int kFrontRightSteeringMotorId = 10;
   public static int kFrontRightDrivingMotorId = 11;
   public static int kFrontRightEncoderAIOChannel = 0;
-  public static short kFrontRightEncoderOffset = 698; // Test bench
+  public static short kFrontRightEncoderOffset = 53; // Test bench
+  // public static short kFrontRightEncoderOffset = 698; // Test bench
   // public static short kFrontLeftEncoderOffset = 202; // Test bench
 
   // FL
   public static int kFrontLeftSteeringMotorId = 12;
   public static int kFrontLeftDrivingMotorId = 13;
   public static int kFrontLeftEncoderAIOChannel = 1;
-  public static short kFrontLeftEncoderOffset = 1970; // Test bench
+  // public static short kFrontLeftEncoderOffset = 1970; // Test bench
+  public static short kFrontLeftEncoderOffset = -1150; // Test bench
 
   // RR
-  public static int kRearRightSteeringMotorId = 14;
-  public static int kRearRightDrivingMotorId = 15;
+  public static int kRearRightSteeringMotorId = 15;
+  public static int kRearRightDrivingMotorId = 14;
   public static int kRearRightEncoderAIOChannel = 2;
-  public static short kRearRightEncoderOffset = 1132; // Test bench
+  // public static short kRearRightEncoderOffset = 1132; // Test bench
+  public static short kRearRightEncoderOffset = -350; // Test bench
 
   // RL
   public static int kRearLeftSteeringMotorId = 16;
   public static int kRearLeftDrivingMotorId = 17;
   public static int kRearLeftEncoderAIOChannel = 3;
-  public static short kRearLeftEncoderOffset = 3476; // Test bench
-
+  // public static short kRearLeftEncoderOffset = 3476; // Test bench
+  public static short kRearLeftEncoderOffset = -1250; // Test bench
 }

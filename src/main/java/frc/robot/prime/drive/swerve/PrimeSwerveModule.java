@@ -1,7 +1,10 @@
 package frc.robot.prime.drive.swerve;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.MathUtil;
@@ -27,22 +30,28 @@ public class PrimeSwerveModule {
     int driveMotorId,
     int steeringMotorId,
     int encoderAioChannel,
-    short encoderBasePositionOffset
+    short encoderBasePositionOffset,
+    boolean invertDrive
   ) {
     // Set up the steering motor
     m_steeringMotor = new WPI_TalonFX(steeringMotorId);
     // m_steeringMotor = new TalonSRX(steeringMotorId);
     m_steeringMotor.configFactoryDefault();
     m_steeringMotor.setNeutralMode(NeutralMode.Brake);
+    m_steeringMotor.setInverted(true);
+    m_steeringMotor.configOpenloopRamp(0.2);
+
 
     // Set up the drive motor
     m_driveMotor = new WPI_TalonFX(driveMotorId);
     m_driveMotor.setNeutralMode(NeutralMode.Coast);
-    // m_driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor); // The integrated sensor in the Falcon is the falcon's encoder
-    // m_driveMotor.config_kP(0, PrimeSwerveDriveTrain.kDrivePidConstants.kP);
-    // m_driveMotor.config_kI(0, PrimeSwerveDriveTrain.kDrivePidConstants.kI);
-    // m_driveMotor.config_kD(0, PrimeSwerveDriveTrain.kDrivePidConstants.kD);
-    m_driveMotor.configOpenloopRamp(0.1);
+    m_driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor); // The integrated sensor in the Falcon is the falcon's encoder
+    m_driveMotor.config_kP(0, PrimeSwerveDriveTrain.kDrivePidConstants.kP);
+    m_driveMotor.config_kI(0, PrimeSwerveDriveTrain.kDrivePidConstants.kI);
+    m_driveMotor.config_kD(0, PrimeSwerveDriveTrain.kDrivePidConstants.kD);
+    m_driveMotor.configOpenloopRamp(0.2);
+    m_driveMotor.configClosedloopRamp(0.2);
+    m_driveMotor.setInverted(invertDrive);
 
     // Set up our encoder
     m_encoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset);
@@ -54,7 +63,7 @@ public class PrimeSwerveModule {
       PrimeSwerveDriveTrain.kSteeringPidConstants.kD
     );
     m_steeringPIDController.enableContinuousInput(-Math.PI, Math.PI);
-    m_steeringPIDController.setTolerance(2 / 360);
+    m_steeringPIDController.setTolerance(1 / 1024);
 
     SmartDashboard.putData("Steering PID", m_steeringPIDController);
   }
@@ -68,26 +77,16 @@ public class PrimeSwerveModule {
     var encoderRotation = m_encoder.getRotation2d().rotateBy(new Rotation2d(90));
     desiredState = SwerveModuleState.optimize(desiredState, encoderRotation);
 
-    // m_driveMotor.set(ControlMode.Velocity, desiredState.speedMetersPerSecond);
+    m_driveMotor.set(ControlMode.Velocity, desiredState.speedMetersPerSecond);
     var currentPositionRadians = encoderRotation.getRadians();
     var desiredPositionRadians = desiredState.angle.getRadians();
     
     var steeringOutput = m_steeringPIDController.calculate(currentPositionRadians, desiredPositionRadians);
-    // steeringOutput = MathUtil.applyDeadband(steeringOutput, 0.1);
-    
-    System.out.println(">>>");
-    System.out.println("Desired angle in degrees: " + desiredState.angle.getDegrees());
-    System.out.println("Current angle in degrees: " + encoderRotation.getDegrees());
-    System.out.println("Difference in radians: " + m_steeringPIDController.getPositionError());
-    System.out.println("PID Output: " + steeringOutput);
-    System.out.println(">>>");
-
+    steeringOutput = MathUtil.applyDeadband(steeringOutput, 0.1);
     m_steeringMotor.set(ControlMode.PercentOutput, MathUtil.clamp(steeringOutput, -1, 1));
   }
 
   public void driveSimple(double fwd, double rot) {
-    System.out.println("FWD: " + fwd);
-    System.out.println("ROT: " + rot);
     m_driveMotor.set(fwd);
     m_steeringMotor.set(rot);
   }

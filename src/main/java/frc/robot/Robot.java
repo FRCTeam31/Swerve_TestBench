@@ -4,21 +4,10 @@
 
 package frc.robot;
 
-import java.io.Console;
-
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.RuntimeDetector;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.config.RobotMap;
 import frc.robot.prime.drive.swerve.PrimeSwerveDriveTrain;
@@ -71,7 +60,11 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    // System.out.println("Module angle in Rads: " + m_swerve.m_frontLeftModule.m_encoder.getRotation2d().getRadians());
+    // System.out.println(">>>");
+    // System.out.println("FL Encoder offset: " + m_swerve.m_frontLeftModule.m_encoder.getValue());
+    // System.out.println("FR Encoder offset: " + m_swerve.m_frontRightModule .m_encoder.getValue());
+    // System.out.println("RL Encoder offset: " + m_swerve.m_rearLeftModule.m_encoder.getValue());
+    // System.out.println("RR Encoder offset: " + m_swerve.m_rearRightModule.m_encoder.getValue());
   }
 
   @Override
@@ -91,6 +84,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driveWithJoystick(true);
+
+    SmartDashboard.putNumber("Front Right Encoder Offset", RobotMap.kFrontLeftEncoderOffset);
+    SmartDashboard.putNumber("Front Left Encoder Offset", RobotMap.kFrontRightEncoderOffset);
+    SmartDashboard.putNumber("Rear Right Encoder Offset", RobotMap.kRearRightEncoderOffset);
+    SmartDashboard.putNumber("Rear Left Encoder Offset", RobotMap.kRearLeftEncoderOffset);
   }
 
   private void driveWithJoystick(boolean fieldRelative) {
@@ -100,12 +98,9 @@ public class Robot extends TimedRobot {
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = MathUtil.applyDeadband((-m_controller.getLeftTriggerAxis() + m_controller.getRightTriggerAxis()),
+    var rotation = MathUtil.applyDeadband((m_controller.getLeftTriggerAxis() + -m_controller.getRightTriggerAxis()),
       kJoystickDeadband);
 
-    m_swerve.drive(strafeX, forwardY, rotation, false);
-
-    // System.out.println("FL module speed:" + m_swerve.m_frontLeftModule.getState().speedMetersPerSecond);
-    // System.out.println("FL module angle:" + m_swerve.m_frontLeftModule.getState().angle.getDegrees());
+    m_swerve.drive(forwardY, strafeX, rotation, false);
   }
 }

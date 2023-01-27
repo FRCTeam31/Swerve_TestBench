@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,7 +15,7 @@ import frc.robot.prime.drive.swerve.PrimeSwerveDriveTrain;
 
 public class Robot extends TimedRobot {
   private PrimeSwerveDriveTrain m_swerve;
-  private XboxController m_controller;
+  private Joystick m_controller;
 
   private final double kJoystickDeadband = 0.15;
 
@@ -41,7 +42,7 @@ public class Robot extends TimedRobot {
     // Talon2 = new TalonSRX(RobotMap.TALON_2_ID);
     // Solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLENOID_1_ID);
     // Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOlENOID_2_ID);
-    m_controller = new XboxController(0);
+    m_controller = new Joystick(0);
     // Spark1 = new CANSparkMax(RobotMap.SPARK_1_ID, MotorType.kBrushless);
     m_swerve = new PrimeSwerveDriveTrain();
   }
@@ -93,12 +94,12 @@ public class Robot extends TimedRobot {
 
   private void driveWithJoystick(boolean fieldRelative) {
     // Grab the X and Y axis from the left joystick on the controller
-    var strafeX = MathUtil.applyDeadband(m_controller.getLeftX(), kJoystickDeadband);
-    var forwardY = -1 * MathUtil.applyDeadband(m_controller.getLeftY(), kJoystickDeadband);
+    var strafeX = MathUtil.applyDeadband(m_controller.getRawAxis(0), kJoystickDeadband);
+    var forwardY = -1 * MathUtil.applyDeadband(m_controller.getRawAxis(1), kJoystickDeadband);
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = MathUtil.applyDeadband((m_controller.getLeftTriggerAxis() + -m_controller.getRightTriggerAxis()),
+    var rotation = MathUtil.applyDeadband((m_controller.getRawAxis(3) + -m_controller.getRawAxis(2)),
       kJoystickDeadband);
 
     m_swerve.drive(forwardY, strafeX, rotation, false);

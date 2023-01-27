@@ -14,7 +14,7 @@ public class PrimeSwerveDriveTrain {
 
   // Default PID values for steering each module and driving each module
   public static final PidConstants kDrivePidConstants = new PidConstants(0.01, 0, 0);
-  public static final PidConstants kSteeringPidConstants = new PidConstants(1);
+  public static final PidConstants kSteeringPidConstants = new PidConstants(0.5);
 
   // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
   double halfWheelBase = RobotMap.kRobotWheelBaseMeters / 2;
@@ -27,32 +27,32 @@ public class PrimeSwerveDriveTrain {
   // Build serve drive modules with encoder channel & offset, and CAN IDs for drive and steering motors
   // Front Left
   public final PrimeSwerveModule m_frontLeftModule = new PrimeSwerveModule(
-    RobotMap.kFrontLeftSteeringMotorId, 
     RobotMap.kFrontLeftDrivingMotorId, 
+    RobotMap.kFrontLeftSteeringMotorId, 
     RobotMap.kFrontLeftEncoderAIOChannel,
     RobotMap.kFrontLeftEncoderOffset,
     true);
 
   // Front Right
   public final PrimeSwerveModule m_frontRightModule = new PrimeSwerveModule(
-    RobotMap.kFrontRightSteeringMotorId, 
     RobotMap.kFrontRightDrivingMotorId, 
+    RobotMap.kFrontRightSteeringMotorId, 
     RobotMap.kFrontRightEncoderAIOChannel, 
     RobotMap.kFrontRightEncoderOffset,
     false);
 
   // Rear Left
   public final PrimeSwerveModule m_rearLeftModule = new PrimeSwerveModule(
-    RobotMap.kRearLeftSteeringMotorId, 
     RobotMap.kRearLeftDrivingMotorId, 
+    RobotMap.kRearLeftSteeringMotorId, 
     RobotMap.kRearLeftEncoderAIOChannel, 
     RobotMap.kRearLeftEncoderOffset,
     true);
 
   // Rear Right
   public final PrimeSwerveModule m_rearRightModule = new PrimeSwerveModule(
-    RobotMap.kRearRightSteeringMotorId, 
     RobotMap.kRearRightDrivingMotorId, 
+    RobotMap.kRearRightSteeringMotorId, 
     RobotMap.kRearRightEncoderAIOChannel, 
     RobotMap.kRearRightEncoderOffset,
     false);

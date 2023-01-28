@@ -5,16 +5,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.config.RobotMap;
-import frc.robot.prime.models.PidConstants;
 
 public class PrimeSwerveDriveTrain {
-  public static final double kMaxSpeed = 0.27432; // in meters per second
+  public static final double kMaxSpeed = 1; // in meters per second
   public static final double kMaxAngularSpeed = Math.PI * 0.66; // 180 degrees per second, half rotation
-
-  // Default PID values for steering each module and driving each module
-  public static final PidConstants kDrivePidConstants = new PidConstants(0.01, 0, 0);
-  public static final PidConstants kSteeringPidConstants = new PidConstants(0.5);
 
   // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
   double halfWheelBase = RobotMap.kRobotWheelBaseMeters / 2;
@@ -60,7 +56,11 @@ public class PrimeSwerveDriveTrain {
   // Build a gyro and a kinematics class for our drive
   // final AHRS m_gyro = new AHRS(Port.kUSB);
   final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
-  final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, rearLeftLocation, rearRightLocation);
+  final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+    frontLeftLocation,
+    rearLeftLocation, 
+    rearRightLocation,
+    frontRightLocation);
 
   public PrimeSwerveDriveTrain() {
     
@@ -75,12 +75,14 @@ public class PrimeSwerveDriveTrain {
       ? ChassisSpeeds.fromFieldRelativeSpeeds(str, fwd, rot, m_gyro.getRotation2d())
       : new ChassisSpeeds(str, fwd, rot);
 
+    SmartDashboard.putNumber("desired heading:", Math.tan(desiredChassisSpeeds.vyMetersPerSecond / desiredChassisSpeeds.vxMetersPerSecond));
+
     var swerveModuleStates = m_kinematics.toSwerveModuleStates(desiredChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
     m_frontLeftModule.setDesiredState(swerveModuleStates[0]);
-    m_frontRightModule.setDesiredState(swerveModuleStates[1]);
-    m_rearLeftModule.setDesiredState(swerveModuleStates[2]);
-    m_rearRightModule.setDesiredState(swerveModuleStates[3]);
+    m_rearLeftModule.setDesiredState(swerveModuleStates[1]);
+    m_rearRightModule.setDesiredState(swerveModuleStates[2]);
+    m_frontRightModule.setDesiredState(swerveModuleStates[3]);
   }
 }

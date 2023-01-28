@@ -1,5 +1,8 @@
 package frc.robot.config;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import frc.robot.prime.models.PidConstants;
+
 public class RobotMap {
   public static final double kRobotTrackWidthInches = 24.5;
   public static final double kRobotTrackWidthMeters = 0.6223;
@@ -31,6 +34,22 @@ public class RobotMap {
         698, 1970, 1132, 3476,
    */
 
+  // Default PID values for steering each module and driving each module
+  public static byte kDriveMotorOutputTeeth = 13;
+  public static byte kDriveMotorDrivenGearTeeth = 42;
+  public static double kDriveGearRatio = kDriveMotorDrivenGearTeeth / kDriveMotorOutputTeeth;
+  public static double kDriveWheelCircumference = (Math.PI * 0.1016);
+  public static final double driveKs = -0.13939;
+  public static final double driveKv = 0.029115;
+  public static final double driveKa = 0.0050108;
+  public static final double driveKp = 0.0016983;
+  public static final PidConstants kDrivePidConstants = new PidConstants(driveKp);
+
+  public static final double steeringKp = 0.5;
+  public static final double steeringKi = 0;
+  public static final double steeringKd = 0;
+  public static final PidConstants kSteeringPidConstants = new PidConstants(steeringKp, steeringKi, steeringKd);
+
   // FR
   public static int kFrontRightSteeringMotorId = 11;
   public static int kFrontRightDrivingMotorId = 10;
@@ -61,6 +80,5 @@ public class RobotMap {
   public static short kRearLeftEncoderOffset = -1250; // Test bench
 
   // Gear ratios
-  public static byte driveMotorOutputTeeth = 13;
-  public static byte driveMotorDriveGearTeeth = 42;
+  
 }

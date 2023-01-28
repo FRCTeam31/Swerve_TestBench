@@ -56,28 +56,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    // System.out.println(">>>");
-    // System.out.println("FL Encoder offset: " + m_swerve.m_frontLeftModule.m_encoder.getValue());
-    // System.out.println("FR Encoder offset: " + m_swerve.m_frontRightModule .m_encoder.getValue());
-    // System.out.println("RL Encoder offset: " + m_swerve.m_rearLeftModule.m_encoder.getValue());
-    // System.out.println("RR Encoder offset: " + m_swerve.m_rearRightModule.m_encoder.getValue());
   }
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    // if (m_autonomousCommand != null) {
-    //   m_autonomousCommand.cancel();
-    // }
-
     m_swerve.resetGyro();
   }
 
@@ -99,7 +82,7 @@ public class Robot extends TimedRobot {
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = MathUtil.applyDeadband((m_controller.getRawAxis(3) + -m_controller.getRawAxis(2)),
+    var rotation = MathUtil.applyDeadband((m_controller.getRawAxis(3) - m_controller.getRawAxis(2)),
       kJoystickDeadband);
 
     m_swerve.drive(forwardY, strafeX, rotation, false);

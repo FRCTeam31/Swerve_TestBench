@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
@@ -23,20 +25,54 @@ public class PrimeSwerveModuleSubsystem  extends SubsystemBase{
     int encoderBasePositionOffset,
     boolean invertDrive
  ){
-    m_steeringMotor = new WPI_TalonFX(steeringMotorId);
-    m_steeringMotor.configFactoryDefault();
+   //  m_steeringMotor = new WPI_TalonFX(steeringMotorId);
+   //  m_steeringMotor.configFactoryDefault();
 
-    m_driveMotor = new WPI_TalonFX(driveMotorId);
-    m_driveMotor.configFactoryDefault();
-    m_driveMotor.setInverted(TalonFXInvertType.Clockwise);
+   //  m_driveMotor = new WPI_TalonFX(driveMotorId);
+   //  m_driveMotor.configFactoryDefault();
+   //  m_driveMotor.setInverted(TalonFXInvertType.Clockwise);
  
-    m_encoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset );
+   //  m_encoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset );
     
-    m_steeringPIDController = new PIDController(
-      SwerveDriveTrainSubsystem.kSteeringPidConstants.kP, 
-      SwerveDriveTrainSubsystem.kSteeringPidConstants.kI, 
-      SwerveDriveTrainSubsystem.kSteeringPidConstants.kD
-    );
+   //  m_steeringPIDController = new PIDController(
+   //    SwerveDriveTrainSubsystem.kSteeringPidConstants.kP, 
+   //    SwerveDriveTrainSubsystem.kSteeringPidConstants.kI, 
+   //    SwerveDriveTrainSubsystem.kSteeringPidConstants.kD
+   //  );
+
+   // Set up the steering motor
+   m_steeringMotor = new WPI_TalonFX(steeringMotorId);
+   m_steeringMotor.configFactoryDefault();
+   m_steeringMotor.setNeutralMode(NeutralMode.Brake);
+   m_steeringMotor.setInverted(true);
+   m_steeringMotor.configOpenloopRamp(0.2);
+
+
+   // Set up the drive motor
+   m_driveMotor = new WPI_TalonFX(driveMotorId);
+   m_driveMotor.configFactoryDefault();
+   m_driveMotor.clearStickyFaults();
+   m_driveMotor.setNeutralMode(NeutralMode.Brake);
+   m_driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor); // The integrated sensor in the Falcon is the falcon's encoder
+   // m_driveMotor.config_kP(0, RobotMap.kDrivePidConstants.kP);
+   m_driveMotor.configOpenloopRamp(0.2);
+   // m_driveMotor.configClosedloopRamp(0.2);
+   m_driveMotor.setInverted(invertDrive);
+
+   // Set up our encoder
+   m_encoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset);
+
+   // Create a PID controller to calculate steering motor output
+   m_driveFeedforward = new SimpleMotorFeedforward(RobotMap.driveKs, RobotMap.driveKv, RobotMap.driveKa);
+   m_steeringPIDController = new PIDController(
+     RobotMap.kSteeringPidConstants.kP, 
+     RobotMap.kSteeringPidConstants.kI, 
+     RobotMap.kSteeringPidConstants.kD
+   );
+   m_steeringPIDController.enableContinuousInput(-Math.PI, Math.PI);
+   m_steeringPIDController.setTolerance(0.1);
+
+   m_drivePIDController = new PIDController(RobotMap.kDrivePidConstants.kP, 0, 0);
  }
 
  public void setDesiredState(SwerveModuleState desiredState){

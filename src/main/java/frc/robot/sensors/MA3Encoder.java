@@ -6,15 +6,21 @@ import edu.wpi.first.wpilibj.AnalogInput;
 public class MA3Encoder extends AnalogInput {
     public final double kPositionsPerRotation = 4096d;
     public int BasePositionOffset = 0;
+    private boolean mInverted = false;
 
-    public MA3Encoder(int analogChannel, int basePositionOffset) {
+    public MA3Encoder(int analogChannel, int basePositionOffset, boolean inverted = false) {
         super(analogChannel);
         BasePositionOffset = basePositionOffset;
+        mInverted = inverted;
     }
 
     @Override
     public int getValue() {
-        return super.getValue() + BasePositionOffset;
+        var offsetValue = super.getValue() + BasePositionOffset;
+        
+        return mInverted
+            ? kPositionsPerRotation - offsetValue;
+            : offsetValue;
     }
     
     public double getAngle() {

@@ -61,11 +61,10 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    // System.out.println(">>>");
-    // System.out.println("FL Encoder offset: " + m_swerve.m_frontLeftModule.m_encoder.getValue());
-    // System.out.println("FR Encoder offset: " + m_swerve.m_frontRightModule .m_encoder.getValue());
-    // System.out.println("RL Encoder offset: " + m_swerve.m_rearLeftModule.m_encoder.getValue());
-    // System.out.println("RR Encoder offset: " + m_swerve.m_rearRightModule.m_encoder.getValue());
+    SmartDashboard.putNumber("Front Right Encoder Value", m_swerve.m_frontRightModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Front Left Encoder Value", m_swerve.m_frontLeftModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Rear Right Encoder Value", m_swerve.m_rearRightModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Rear Left Encoder Value",  m_swerve.m_rearLeftModule.mEncoder.getRawValue());
   }
 
   @Override
@@ -85,23 +84,17 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driveWithJoystick(true);
-
-    SmartDashboard.putNumber("Front Right Encoder Offset", RobotMap.kFrontLeftEncoderOffset);
-    SmartDashboard.putNumber("Front Left Encoder Offset", RobotMap.kFrontRightEncoderOffset);
-    SmartDashboard.putNumber("Rear Right Encoder Offset", RobotMap.kRearRightEncoderOffset);
-    SmartDashboard.putNumber("Rear Left Encoder Offset", RobotMap.kRearLeftEncoderOffset);
   }
 
   private void driveWithJoystick(boolean fieldRelative) {
     // Grab the X and Y axis from the left joystick on the controller
-    var strafeX = MathUtil.applyDeadband(m_controller.getRawAxis(0), kJoystickDeadband);
-    var forwardY = -1 * MathUtil.applyDeadband(m_controller.getRawAxis(1), kJoystickDeadband);
+    var strafeX = m_controller.getRawAxis(0);
+    var forwardY = -m_controller.getRawAxis(1);
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = MathUtil.applyDeadband((m_controller.getRawAxis(3) + -m_controller.getRawAxis(2)),
-      kJoystickDeadband);
+    var rotation = m_controller.getRawAxis(3) + -m_controller.getRawAxis(2);
 
-    m_swerve.drive(forwardY, strafeX, rotation, false);
+    m_swerve.drive(strafeX, forwardY, rotation, true);
   }
 }

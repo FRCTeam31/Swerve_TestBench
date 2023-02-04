@@ -50,7 +50,7 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
    mDriveMotor.setInverted(invertDrive);
 
    // Set up our encoder
-   m_encoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset);
+   m_encoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset, true);
 
    // Create a PID controller to calculate steering motor output
    mDriveFeedforward = new SimpleMotorFeedforward(RobotMap.driveKs, RobotMap.driveKv, RobotMap.driveKa);

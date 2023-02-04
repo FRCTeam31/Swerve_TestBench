@@ -9,9 +9,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.RobotMap;
 import frc.robot.prime.models.PidConstants;
+import frc.robot.sensors.navx.AHRS;
 
 public class SwerveDriveTrainSubsystem extends SubsystemBase {
  
@@ -64,8 +66,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
     false);
 
   // Build a gyro and a kinematics class for our drive
-  // final AHRS m_gyro = new AHRS(Port.kUSB);
-  final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+  final AHRS m_gyro = new AHRS(Port.kUSB);
   final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
     frontLeftLocation, 
     frontRightLocation, 

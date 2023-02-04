@@ -16,11 +16,11 @@ import frc.robot.prime.models.PidConstants;
 public class SwerveDriveTrainSubsystem extends SubsystemBase {
  
   public static final double kMaxSpeed = 0.27432; // in meters per second
-  public static final double kMaxAngularSpeed = Math.PI * 0.66; // 180 degrees per second, half rotation
+  public static final double kMaxAngularSpeed = RobotMap.kRobotWheelBaseCircumference / kMaxSpeed; // 180 degrees per second, half rotation
 
   // Default PID values for steering each module and driving each module
   public static final PidConstants kDrivePidConstants = new PidConstants(0.01, 0, 0);
-  public static final PidConstants kSteeringPidConstants = new PidConstants(0.5);
+  public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
 
   // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
   double halfWheelBase = RobotMap.kRobotWheelBaseMeters / 2;
@@ -37,7 +37,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
     RobotMap.kFrontLeftSteeringMotorId, 
     RobotMap.kFrontLeftEncoderAIOChannel,
     RobotMap.kFrontLeftEncoderOffset,
-    true);
+    false);
 
   // Front Right
   public final PrimeSwerveModuleSubsystem m_frontRightModule = new PrimeSwerveModuleSubsystem (
@@ -53,7 +53,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
     RobotMap.kRearLeftSteeringMotorId, 
     RobotMap.kRearLeftEncoderAIOChannel, 
     RobotMap.kRearLeftEncoderOffset,
-    true);
+    false);
 
   // Rear Right
   public final PrimeSwerveModuleSubsystem m_rearRightModule = new PrimeSwerveModuleSubsystem (
@@ -66,7 +66,11 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
   // Build a gyro and a kinematics class for our drive
   // final AHRS m_gyro = new AHRS(Port.kUSB);
   final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
-  final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, rearLeftLocation, rearRightLocation);
+  final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+    frontLeftLocation, 
+    frontRightLocation, 
+    rearLeftLocation, 
+    rearRightLocation);
   /** Creates a new SwerveDriveTrainSubsystem. */
   public SwerveDriveTrainSubsystem() {}
 
@@ -84,7 +88,8 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
       ? ChassisSpeeds.fromFieldRelativeSpeeds(str, fwd, rot, m_gyro.getRotation2d())
       : new ChassisSpeeds(str, fwd, rot);
 
-    var swerveModuleStates = m_kinematics.toSwerveModuleStates(desiredChassisSpeeds);
+    var swerveModuleStates = m_kinematics.toSwerveModuleStates(
+      desiredChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
     m_frontLeftModule.setDesiredState(swerveModuleStates[0]);

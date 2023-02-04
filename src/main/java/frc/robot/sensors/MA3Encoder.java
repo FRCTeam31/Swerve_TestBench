@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 public class MA3Encoder extends AnalogInput {
-    public static final double ENC_POSITIONS_PER_REVOLUTION = 4096d;
+    public final double kPositionsPerRotation = 4096d;
     public int BasePositionOffset = 0;
 
     public MA3Encoder(int analogChannel, int basePositionOffset) {
@@ -18,7 +18,7 @@ public class MA3Encoder extends AnalogInput {
     }
     
     public double getAngle() {
-        return (getValue() / ENC_POSITIONS_PER_REVOLUTION) * 360;
+        return (getValue() / kPositionsPerRotation) * 360;
     }
 
     public Rotation2d getRotation2d() {

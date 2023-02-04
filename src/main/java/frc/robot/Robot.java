@@ -4,34 +4,32 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.*;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.config.RobotMap;
+import frc.robot.subsystems.SwerveDriveTrainSubsystem;
 
-/**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
- * project.
- */
 public class Robot extends TimedRobot {
-  final byte Talon1Id = 1;
-  final byte Falcon1Id = 2;
-  final byte Spark1Id = 3;
-  final byte Solenoid1Id = 1;
-  final byte Solenoid2Id = 2;
+  private SwerveDriveTrainSubsystem m_swerve;
+  private Joystick m_controller;
 
-  private TalonSRX Talon1;
-  private WPI_TalonFX Falcon;
-  private CANSparkMax Spark;
-  private Solenoid Solenoid1;
-  private Solenoid Solenoid2;
-  private Joystick Joystick1;
+  private final double kJoystickDeadband = 0.15;
+
+  // private TalonSRX Talon1;
+  // private WPI_TalonFX Falcon1;
+  // private TalonSRX Talon2;
+  // private CANSparkMax Spark1;
+  // private Solenoid Solenoid1;
+  // private Solenoid Solenoid2;
+  // private Joystick Joystick1;
+  // private Command m_autonomousCommand;
+
+  // private RobotContainer m_robotContainer;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -39,12 +37,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    Talon1 = new TalonSRX(Talon1Id);
-    Falcon = new WPI_TalonFX(Falcon1Id);
-    Spark = new CANSparkMax(Spark1Id, MotorType.kBrushed);
-    Solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, Solenoid1Id);
-    Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, Solenoid2Id);
-    Joystick1 = new Joystick(0);
+    // Talon1 = new TalonSRX(RobotMap.TALON_1_ID);
+    // Falcon1 = new WPI_TalonFX(RobotMap.FALCON_2_ID);
+    // Talon2 = new TalonSRX(RobotMap.TALON_2_ID);
+    // Solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLENOID_1_ID);
+    // Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOlENOID_2_ID);
+    m_controller = new Joystick(0);
+    // Spark1 = new CANSparkMax(RobotMap.SPARK_1_ID, MotorType.kBrushless);
+    m_swerve = new SwerveDriveTrainSubsystem();
   }
 
   /**
@@ -55,54 +55,53 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
+    // commands, running already-scheduled commands, removing finished or interrupted commands,
+    // and running subsystem periodic() methods.  This must be called from the robot's periodic
+    // block in order for anything in the Command-based framework to work.
+    CommandScheduler.getInstance().run();
+    // System.out.println(">>>");
+    // System.out.println("FL Encoder offset: " + m_swerve.m_frontLeftModule.m_encoder.getValue());
+    // System.out.println("FR Encoder offset: " + m_swerve.m_frontRightModule .m_encoder.getValue());
+    // System.out.println("RL Encoder offset: " + m_swerve.m_rearLeftModule.m_encoder.getValue());
+    // System.out.println("RR Encoder offset: " + m_swerve.m_rearRightModule.m_encoder.getValue());
+  }
 
-  /**
-   * This autonomous (along with the chooser code above) shows how to select between different
-   * autonomous modes using the dashboard. The sendable chooser code works with the Java
-   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
-   * uncomment the getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
-   * below with additional strings. If using the SendableChooser make sure to add them to the
-   * chooser code above as well.
-   */
   @Override
-  public void autonomousInit() {}
+  public void teleopInit() {
+    // This makes sure that the autonomous stops running when
+    // teleop starts running. If you want the autonomous to
+    // continue until interrupted by another command, remove
+    // this line or comment it out.
+    // if (m_autonomousCommand != null) {
+    //   m_autonomousCommand.cancel();
+    // }
 
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {}
-
-  /** This function is called once when teleop is enabled. */
-  @Override
-  public void teleopInit() {}
+    m_swerve.resetGyro();
+  }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    driveWithJoystick(true);
 
-  /** This function is called once when the robot is disabled. */
-  @Override
-  public void disabledInit() {}
+    SmartDashboard.putNumber("Front Right Encoder Offset", RobotMap.kFrontLeftEncoderOffset);
+    SmartDashboard.putNumber("Front Left Encoder Offset", RobotMap.kFrontRightEncoderOffset);
+    SmartDashboard.putNumber("Rear Right Encoder Offset", RobotMap.kRearRightEncoderOffset);
+    SmartDashboard.putNumber("Rear Left Encoder Offset", RobotMap.kRearLeftEncoderOffset);
+  }
 
-  /** This function is called periodically when disabled. */
-  @Override
-  public void disabledPeriodic() {}
+  private void driveWithJoystick(boolean fieldRelative) {
+    // Grab the X and Y axis from the left joystick on the controller
+    var strafeX = MathUtil.applyDeadband(m_controller.getRawAxis(0), kJoystickDeadband);
+    var forwardY = -1 * MathUtil.applyDeadband(m_controller.getRawAxis(1), kJoystickDeadband);
 
-  /** This function is called once when test mode is enabled. */
-  @Override
-  public void testInit() {}
+    // Right trigger should rotate the robot clockwise, left counterclockwise
+    // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
+    var rotation = MathUtil.applyDeadband((m_controller.getRawAxis(3) + -m_controller.getRawAxis(2)),
+      kJoystickDeadband);
 
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
-
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {}
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
+    m_swerve.drive(forwardY, strafeX, rotation, false);
+  }
 }

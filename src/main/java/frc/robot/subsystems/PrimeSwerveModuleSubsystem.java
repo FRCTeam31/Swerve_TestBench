@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.prime.drive.swerve.PrimeSwerveDriveTrain;
 import frc.robot.sensors.MA3Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -29,9 +28,9 @@ public class PrimeSwerveModuleSubsystem  extends SubsystemBase{
     m_driveMotor = new WPI_TalonFX(driveMotorId);
     m_encoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset );
     m_steeringPIDController = new PIDController(
-      PrimeSwerveDriveTrain.kSteeringPidConstants.kP, 
-      PrimeSwerveDriveTrain.kSteeringPidConstants.kI, 
-      PrimeSwerveDriveTrain.kSteeringPidConstants.kD
+      SwerveDriveTrainSubsystem.kSteeringPidConstants.kP, 
+      SwerveDriveTrainSubsystem.kSteeringPidConstants.kI, 
+      SwerveDriveTrainSubsystem.kSteeringPidConstants.kD
     );
  }
 
@@ -39,7 +38,7 @@ public class PrimeSwerveModuleSubsystem  extends SubsystemBase{
     var encoderRotation = m_encoder.getRotation2d().rotateBy(new Rotation2d(90));
     desiredState = SwerveModuleState.optimize(desiredState, encoderRotation);
 
-    m_driveMotor.set(ControlMode.PercentOutput, desiredState.speedMetersPerSecond / PrimeSwerveDriveTrain.kMaxSpeed);
+    m_driveMotor.set(ControlMode.PercentOutput, desiredState.speedMetersPerSecond / SwerveDriveTrainSubsystem.kMaxSpeed);
     var currentPositionRadians = encoderRotation.getRadians();
     var desiredPositionRadians = desiredState.angle.getRadians();
 

@@ -1,14 +1,20 @@
-package frc.robot.prime.drive.swerve;
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.RobotMap;
 import frc.robot.prime.models.PidConstants;
 
-public class PrimeSwerveDriveTrain {
+public class SwerveDriveTrainSubsystem extends SubsystemBase {
+ 
   public static final double kMaxSpeed = 0.27432; // in meters per second
   public static final double kMaxAngularSpeed = Math.PI * 0.66; // 180 degrees per second, half rotation
 
@@ -26,7 +32,7 @@ public class PrimeSwerveDriveTrain {
 
   // Build serve drive modules with encoder channel & offset, and CAN IDs for drive and steering motors
   // Front Left
-  public final PrimeSwerveModule m_frontLeftModule = new PrimeSwerveModule(
+  public final PrimeSwerveModuleSubsystem m_frontLeftModule = new PrimeSwerveModuleSubsystem(
     RobotMap.kFrontLeftDrivingMotorId, 
     RobotMap.kFrontLeftSteeringMotorId, 
     RobotMap.kFrontLeftEncoderAIOChannel,
@@ -34,7 +40,7 @@ public class PrimeSwerveDriveTrain {
     true);
 
   // Front Right
-  public final PrimeSwerveModule m_frontRightModule = new PrimeSwerveModule(
+  public final PrimeSwerveModuleSubsystem m_frontRightModule = new PrimeSwerveModuleSubsystem (
     RobotMap.kFrontRightDrivingMotorId, 
     RobotMap.kFrontRightSteeringMotorId, 
     RobotMap.kFrontRightEncoderAIOChannel, 
@@ -42,7 +48,7 @@ public class PrimeSwerveDriveTrain {
     false);
 
   // Rear Left
-  public final PrimeSwerveModule m_rearLeftModule = new PrimeSwerveModule(
+  public final PrimeSwerveModuleSubsystem m_rearLeftModule = new PrimeSwerveModuleSubsystem (
     RobotMap.kRearLeftDrivingMotorId, 
     RobotMap.kRearLeftSteeringMotorId, 
     RobotMap.kRearLeftEncoderAIOChannel, 
@@ -50,7 +56,7 @@ public class PrimeSwerveDriveTrain {
     true);
 
   // Rear Right
-  public final PrimeSwerveModule m_rearRightModule = new PrimeSwerveModule(
+  public final PrimeSwerveModuleSubsystem m_rearRightModule = new PrimeSwerveModuleSubsystem (
     RobotMap.kRearRightDrivingMotorId, 
     RobotMap.kRearRightSteeringMotorId, 
     RobotMap.kRearRightEncoderAIOChannel, 
@@ -61,9 +67,12 @@ public class PrimeSwerveDriveTrain {
   // final AHRS m_gyro = new AHRS(Port.kUSB);
   final ADXRS450_Gyro m_gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
   final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation, rearLeftLocation, rearRightLocation);
+  /** Creates a new SwerveDriveTrainSubsystem. */
+  public SwerveDriveTrainSubsystem() {}
 
-  public PrimeSwerveDriveTrain() {
-    
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
   }
 
   public void resetGyro() {
@@ -83,4 +92,5 @@ public class PrimeSwerveDriveTrain {
     m_rearLeftModule.setDesiredState(swerveModuleStates[2]);
     m_rearRightModule.setDesiredState(swerveModuleStates[3]);
   }
+
 }

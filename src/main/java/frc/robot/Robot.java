@@ -11,10 +11,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.config.RobotMap;
-import frc.robot.prime.drive.swerve.PrimeSwerveDriveTrain;
+import frc.robot.subsystems.SwerveDriveTrainSubsystem;
 
 public class Robot extends TimedRobot {
-  private PrimeSwerveDriveTrain m_swerve;
+  private SwerveDriveTrainSubsystem m_swerve;
   private Joystick m_controller;
 
   private final double kJoystickDeadband = 0.15;
@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
     // Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOlENOID_2_ID);
     m_controller = new Joystick(0);
     // Spark1 = new CANSparkMax(RobotMap.SPARK_1_ID, MotorType.kBrushless);
-    m_swerve = new PrimeSwerveDriveTrain();
+    m_swerve = new SwerveDriveTrainSubsystem();
   }
 
   /**

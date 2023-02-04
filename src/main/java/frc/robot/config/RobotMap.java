@@ -1,11 +1,28 @@
 package frc.robot.config;
 
+import frc.robot.prime.models.PidConstants;
+
 public class RobotMap {
   public static final double kRobotTrackWidthInches = 24.5;
   public static final double kRobotTrackWidthMeters = 0.6223;
   public static final double kRobotWheelBaseInches = 24;
   public static final double kRobotWheelBaseMeters = 0.6096;
   public static final double kRobotWheelBaseCircumference = 2.73702;
+
+  public static byte kDriveMotorOutputTeeth = 13;
+  public static byte kDriveMotorDrivenGearTeeth = 42;
+  public static double kDriveGearRatio = kDriveMotorDrivenGearTeeth / kDriveMotorOutputTeeth;
+  public static double kDriveWheelCircumference = (Math.PI * 0.1016);
+  public static final double driveKs = -0.13939;
+  public static final double driveKv = 0.029115;
+  public static final double driveKa = 0.0050108;
+  public static final double driveKp = 0.0016983;
+  public static final PidConstants kDrivePidConstants = new PidConstants(driveKp);
+
+  public static final double steeringKp = 0.5;
+  public static final double steeringKi = 0;
+  public static final double steeringKd = 0;
+  public static final PidConstants kSteeringPidConstants = new PidConstants(steeringKp, steeringKi, steeringKd);
 
   // Motor CAN Id Constants
   public static final  byte TALON1_CAN_ID = 3;

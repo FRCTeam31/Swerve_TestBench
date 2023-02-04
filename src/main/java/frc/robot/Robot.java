@@ -5,17 +5,24 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.config.RobotMap;
 import frc.robot.subsystems.SwerveDriveTrainSubsystem;
 
 public class Robot extends TimedRobot {
   private SwerveDriveTrainSubsystem m_swerve;
-  private Joystick m_controller;
+  private CommandJoystick m_controller;
 
   private final double kJoystickDeadband = 0.15;
 
@@ -37,15 +44,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    // Talon1 = new TalonSRX(RobotMap.TALON_1_ID);
-    // Falcon1 = new WPI_TalonFX(RobotMap.FALCON_2_ID);
-    // Talon2 = new TalonSRX(RobotMap.TALON_2_ID);
-    // Solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLENOID_1_ID);
-    // Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOlENOID_2_ID);
-    m_controller = new Joystick(0);
-    // Spark1 = new CANSparkMax(RobotMap.SPARK_1_ID, MotorType.kBrushless);
+    m_controller = new CommandJoystick(0);
     m_swerve = new SwerveDriveTrainSubsystem();
+
+    m_controller.button(3).onTrue(Commands.run(() -> {
+      m_swerve.resetGyro();
+      DriverStation.reportWarning("Y button pressed", false);
+    }));
   }
+
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -94,6 +101,7 @@ public class Robot extends TimedRobot {
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
     var rotation = m_controller.getRawAxis(3) + -m_controller.getRawAxis(2);
+
 
     m_swerve.drive(strafeX, forwardY, rotation, true);
   }

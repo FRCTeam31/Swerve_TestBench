@@ -13,22 +13,27 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.config.RobotMap;
 import frc.robot.sensors.MA3Encoder;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class PrimeSwerveModuleSubsystem extends SubsystemBase {
+public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
  private WPI_TalonFX mSteeringMotor;
  private WPI_TalonFX mDriveMotor;
  public MA3Encoder mEncoder;
  private PIDController mSteeringPIDController;   
  private PIDController mDrivePIDController;
  private SimpleMotorFeedforward mDriveFeedforward;   
-
+   
  public PrimeSwerveModuleSubsystem (
     int driveMotorId,
     int steeringMotorId,
     int encoderAioChannel,
     int encoderBasePositionOffset
  ){
+   // Congfigure PID
+   super(new PIDController(RobotMap.kDrivePidConstants.kP, RobotMap.kDrivePidConstants.kI, RobotMap.kDrivePidConstants.kD));
+   getController().enableContinuousInput(-Math.PI, Math.PI);
+
    // Set up the steering motor
    mSteeringMotor = new WPI_TalonFX(steeringMotorId);
    mSteeringMotor.configFactoryDefault();
@@ -52,13 +57,13 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
 
    // Create a PID controller to calculate steering motor output
    mDriveFeedforward = new SimpleMotorFeedforward(RobotMap.driveKs, RobotMap.driveKv, RobotMap.driveKa);
-   mDrivePIDController = new PIDController(RobotMap.kDrivePidConstants.kP, 0, 0);
+   // mDrivePIDController = new PIDController(RobotMap.kDrivePidConstants.kP, 0, 0);
 
-   mSteeringPIDController = new PIDController(
-     RobotMap.kSteeringPidConstants.kP, 
-     RobotMap.kSteeringPidConstants.kI, 
-     RobotMap.kSteeringPidConstants.kD
-   );
+   // mSteeringPIDController = new PIDController(
+   //   RobotMap.kSteeringPidConstants.kP, 
+   //   RobotMap.kSteeringPidConstants.kI, 
+   //   RobotMap.kSteeringPidConstants.kD
+   // );
    mSteeringPIDController.enableContinuousInput(-Math.PI, Math.PI);
   //  mSteeringPIDController.setTolerance(0.1);
  }
@@ -73,12 +78,14 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
    desiredState = SwerveModuleState.optimize(desiredState, encoderRotation);
 
    // Drive motor logic
-   var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
-   var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
+   // var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
+   // var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
    var desiredVelocity = (desiredState.speedMetersPerSecond / 50) * 2048;
-   var driveFeedforward = mDriveFeedforward.calculate(currentVelocityInMetersPer20ms, desiredVelocity, 0.2);
-   var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);
-   var desiredMotorVelocity = driveFeedback + driveFeedforward;
+   var driveFeedForward = getController().calculate(getMeasurement(), desiredVelocity);
+   // var driveFeedforward = mDriveFeedforward.calculate(currentVelocityInMetersPer20ms, desiredVelocity, 0.2);
+   // var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);
+      var driveFeedback = mDrivePIDController.calculate(getMeasurement(), desiredVelocity);
+   var desiredMotorVelocity = driveFeedback + driveFeedForward;
    mDriveMotor.set(ControlMode.PercentOutput, MathUtil.applyDeadband(desiredMotorVelocity, 0.15));
    
    // Steering motor logic
@@ -96,4 +103,18 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
     mDriveMotor.set(fwd);
     mSteeringMotor.set(rot);
  }
+
+@Override
+protected void useOutput(double output, double setpoint) {
+   // TODO Auto-generated method stub
+   
+}
+
+@Override
+protected double getMeasurement() {
+   // TODO Auto-generated method stub
+   var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
+   var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
+   return currentVelocityInMetersPer20ms;
+}
 }

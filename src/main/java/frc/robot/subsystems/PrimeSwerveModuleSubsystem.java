@@ -9,7 +9,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.config.RobotMap;
 import frc.robot.sensors.MA3Encoder;
@@ -61,6 +63,11 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
    );
    mSteeringPIDController.enableContinuousInput(-Math.PI, Math.PI);
   //  mSteeringPIDController.setTolerance(0.1);
+ }
+
+ public SwerveModulePosition getPosition() {
+  return new SwerveModulePosition(    , mEncoder.getRotation2d()
+  );
  }
 
  /**

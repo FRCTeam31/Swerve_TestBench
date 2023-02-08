@@ -4,9 +4,12 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -63,6 +66,17 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
     frontRightLocation, 
     rearLeftLocation, 
     rearRightLocation);
+
+    SwerveDriveOdometry m_Odometry = new SwerveDriveOdometry(m_kinematics, m_gyro.getRotation2d(), new SwerveModulePosition[]{
+      m_frontLeftModule.getPosition(),
+      m_frontRightModule.getPosition(),
+      m_rearLeftModule.getPosition(),
+      m_rearRightModule.getPosition(),
+    },
+      new Pose2d());
+
+
+    
 
   /** Creates a new SwerveDriveTrainSubsystem. */
   public SwerveDriveTrainSubsystem() {}

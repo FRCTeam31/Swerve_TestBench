@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -67,13 +68,15 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
     rearLeftLocation, 
     rearRightLocation);
 
-    SwerveDriveOdometry m_Odometry = new SwerveDriveOdometry(m_kinematics, m_gyro.getRotation2d(), new SwerveModulePosition[]{
-      m_frontLeftModule.getPosition(),
-      m_frontRightModule.getPosition(),
-      m_rearLeftModule.getPosition(),
-      m_rearRightModule.getPosition(),
-    },
-      new Pose2d());
+    SwerveDriveOdometry m_Odometry = new SwerveDriveOdometry(m_kinematics, 
+      m_gyro.getRotation2d(), 
+      new SwerveModulePosition[]{
+        m_frontLeftModule.getPosition(),
+        m_frontRightModule.getPosition(),
+        m_rearLeftModule.getPosition(),
+        m_rearRightModule.getPosition(),
+      },
+      new Pose2d(0, 0, Rotation2d.fromDegrees(90)));
 
 
     
@@ -84,7 +87,13 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Drivetrain gyro angle", m_gyro.getAngle());
+    var gyroAngle = m_gyro.getRotation2d();
+    SmartDashboard.putNumber("Drivetrain gyro angle", gyroAngle.getDegrees());
+
+    var robotPose = m_Odometry.update(gyroAngle, new SwerveModulePosition[] {
+      m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(),
+      m_rearLeftModule.getPosition(), m_rearRightModule.getPosition()
+    });
   }
 
   public void resetGyro() {

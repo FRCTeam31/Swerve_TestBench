@@ -50,9 +50,9 @@ public class Robot extends TimedRobot {
     m_controller.button(3).onTrue(Commands.runOnce(() -> {
      m_swerve.resetGyro();
      
-     System.out.printLn("[DRIVE] Reset gyro");
+     System.out.println("[DRIVE] Reset gyro");
     }));
-    
+
   }
   
 
@@ -104,7 +104,7 @@ public class Robot extends TimedRobot {
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = m_controller.getRawAxis(3) + -m_controller.getRawAxis(2);
+    var rotation = m_controller.getRawAxis(2) + -m_controller.getRawAxis(3);
 
 
     m_swerve.drive(strafeX, forwardY, rotation, true);

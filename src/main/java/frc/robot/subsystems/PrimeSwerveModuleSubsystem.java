@@ -9,11 +9,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.config.RobotMap;
+import frc.robot.prime.utilities.CTREConverter;
 import frc.robot.sensors.MA3Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -66,8 +66,13 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
  }
 
  public SwerveModulePosition getPosition() {
-  return new SwerveModulePosition(    , mEncoder.getRotation2d()
-  );
+  return new SwerveModulePosition(
+    CTREConverter.falconToMeters(
+      mDriveMotor.getSelectedSensorPosition(), 
+      RobotMap.kDriveWheelCircumference, 
+      RobotMap.kDriveGearRatio
+    ), 
+    mEncoder.getRotation2d());
  }
 
  /**

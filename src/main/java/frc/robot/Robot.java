@@ -47,11 +47,15 @@ public class Robot extends TimedRobot {
     m_controller = new CommandJoystick(0);
     m_swerve = new SwerveDriveTrainSubsystem();
 
-    m_controller.button(3).onTrue(Commands.run(() -> {
-      m_swerve.resetGyro();
-      DriverStation.reportWarning("Y button pressed", false);
+    m_controller.button(3).onTrue(Commands.runOnce(() -> {
+     m_swerve.resetGyro();
+     
+     System.out.printLn("[DRIVE] Reset gyro");
     }));
+    
   }
+  
+
 
 
   /**

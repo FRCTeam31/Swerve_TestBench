@@ -30,8 +30,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
     int encoderAioChannel,
     int encoderBasePositionOffset
  ){
-   // Congfigure PID
-   super(new PIDController(RobotMap.kDrivePidConstants.kP, RobotMap.kDrivePidConstants.kI, RobotMap.kDrivePidConstants.kD));
+   super(new PIDController(RobotMap.kSteeringPidConstants.kP, RobotMap.kSteeringPidConstants.kI, RobotMap.kSteeringPidConstants.kD));
 
    // Set up the steering motor
    mSteeringMotor = new WPI_TalonFX(steeringMotorId);
@@ -40,7 +39,6 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    mSteeringMotor.setNeutralMode(NeutralMode.Brake);
    mSteeringMotor.setInverted(TalonFXInvertType.Clockwise);
    mSteeringMotor.configOpenloopRamp(0.2);
-
 
    // Set up the drive motor
    mDriveMotor = new WPI_TalonFX(driveMotorId);
@@ -64,7 +62,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
      RobotMap.kSteeringPidConstants.kI, 
      RobotMap.kSteeringPidConstants.kD
    );
-   mSteeringPIDController.enableContinuousInput(-Math.PI, Math.PI);
+   getController().enableContinuousInput(-Math.PI, Math.PI);
   //  mSteeringPIDController.setTolerance(0.1);
   enable();
  }
@@ -113,8 +111,10 @@ protected void useOutput(double output, double setpoint) {
 @Override
 protected double getMeasurement() {
    // TODO Auto-generated method stub
-   var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
-   var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
-   return currentVelocityInMetersPer20ms;
+   var encoderRotation = mEncoder.getRotation2d().rotateBy(Rotation2d.fromDegrees(-90));
+   var currentPositionRadians = encoderRotation.getRadians();
+
+
+   return currentPositionRadians;
 }
 }

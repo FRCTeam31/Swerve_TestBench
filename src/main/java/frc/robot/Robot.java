@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
     m_controller.button(3).onTrue(Commands.runOnce(() -> {
      m_swerve.resetGyro();
      
-     System.out.printLn("[DRIVE] Reset gyro");
+     System.out.println("[DRIVE] Reset gyro");
     }));
     
   }

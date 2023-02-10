@@ -13,9 +13,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.config.RobotMap;
 import frc.robot.sensors.MA3Encoder;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class PrimeSwerveModuleSubsystem extends SubsystemBase {
+public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
  private WPI_TalonFX mSteeringMotor;
  private WPI_TalonFX mDriveMotor;
  public MA3Encoder mEncoder;
@@ -29,6 +30,8 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
     int encoderAioChannel,
     int encoderBasePositionOffset
  ){
+   super(new PIDController(RobotMap.kSteeringPidConstants.kP, RobotMap.kSteeringPidConstants.kI, RobotMap.kSteeringPidConstants.kD));
+
    // Set up the steering motor
    mSteeringMotor = new WPI_TalonFX(steeringMotorId);
    mSteeringMotor.configFactoryDefault();
@@ -36,7 +39,6 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
    mSteeringMotor.setNeutralMode(NeutralMode.Brake);
    mSteeringMotor.setInverted(TalonFXInvertType.Clockwise);
    mSteeringMotor.configOpenloopRamp(0.2);
-
 
    // Set up the drive motor
    mDriveMotor = new WPI_TalonFX(driveMotorId);
@@ -59,7 +61,7 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
      RobotMap.kSteeringPidConstants.kI, 
      RobotMap.kSteeringPidConstants.kD
    );
-   mSteeringPIDController.enableContinuousInput(-Math.PI, Math.PI);
+   getController().enableContinuousInput(-Math.PI, Math.PI);
   //  mSteeringPIDController.setTolerance(0.1);
  }
 
@@ -96,4 +98,20 @@ public class PrimeSwerveModuleSubsystem extends SubsystemBase {
     mDriveMotor.set(fwd);
     mSteeringMotor.set(rot);
  }
+
+@Override
+protected void useOutput(double output, double setpoint) {
+   // TODO Auto-generated method stub
+   
+}
+
+@Override
+protected double getMeasurement() {
+   // TODO Auto-generated method stub
+   var encoderRotation = mEncoder.getRotation2d().rotateBy(Rotation2d.fromDegrees(-90));
+   var currentPositionRadians = encoderRotation.getRadians();
+
+
+   return currentPositionRadians;
+}
 }

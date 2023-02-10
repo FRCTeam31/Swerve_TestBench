@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
     //   m_autonomousCommand.cancel();
     // }
 
-    mSwerve.resetGyro();
+    mSwerve.resetGyro(); 
   }
 
   /** This function is called periodically during operator control. */

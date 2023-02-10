@@ -87,7 +87,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    var currentPositionRadians = encoderRotation.getRadians();
    var desiredPositionRadians = desiredState.angle.getRadians();
    var steeringOutput = -mSteeringPIDController.calculate(currentPositionRadians, desiredPositionRadians);
-   steeringOutput = MathUtil.applyDeadband(steeringOutput, 0.05);
+   steeringOutput = MathUtil.applyDeadband(steeringOutput, 0.1);
    mSteeringMotor.set(ControlMode.PercentOutput, MathUtil.clamp(steeringOutput, -1, 1));
  }
 

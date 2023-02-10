@@ -8,25 +8,13 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.subsystems.SwerveDriveTrainSubsystem;
 
 public class Robot extends TimedRobot {
   private SwerveDriveTrainSubsystem mSwerve;
-  private Joystick mController;
-
- 
-
-  // private TalonSRX Talon1;
-  // private WPI_TalonFX Falcon1;
-  // private TalonSRX Talon2;
-  // private CANSparkMax Spark1;
-  // private Solenoid Solenoid1;
-  // private Solenoid Solenoid2;
-  // private Joystick Joystick1;
-  // private Command m_autonomousCommand;
-
-  // private RobotContainer m_robotContainer;
-
+  private CommandJoystick mController;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -34,14 +22,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    // Talon1 = new TalonSRX(RobotMap.TALON_1_ID);
-    // Falcon1 = new WPI_TalonFX(RobotMap.FALCON_2_ID);
-    // Talon2 = new TalonSRX(RobotMap.TALON_2_ID);
-    // Solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLENOID_1_ID);
-    // Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOlENOID_2_ID);
-    mController = new Joystick(0);
-    // Spark1 = new CANSparkMax(RobotMap.SPARK_1_ID, MotorType.kBrushless);
+    mController = new CommandJoystick(0);
     mSwerve = new SwerveDriveTrainSubsystem();
+
+    mController.button(3).onTrue(Commands.runOnce(() -> {
+     mSwerve.resetGyro();
+     
+     System.out.println("[DRIVE] Reset gyro");
+    }));
+
   }
 
   /**
@@ -66,10 +55,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
     // if (m_autonomousCommand != null) {
     //   m_autonomousCommand.cancel();
     // }
@@ -90,7 +75,7 @@ public class Robot extends TimedRobot {
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = mController.getRawAxis(3) + -mController.getRawAxis(2);
+    var rotation = mController.getRawAxis(2) + -mController.getRawAxis(3);
 
     mSwerve.drive(strafeX, forwardY, rotation, true);
   }

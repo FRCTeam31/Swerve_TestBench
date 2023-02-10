@@ -23,7 +23,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
   // Default PID values for steering each module and driving each module
   public static final PidConstants kDrivePidConstants = new PidConstants(0.01);
   public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
-  private final Field2d m_field = new Field2d();
+  private final Field2d mField = new Field2d();
 
   // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
   double halfWheelBase = RobotMap.kRobotWheelBaseMeters / 2;
@@ -35,48 +35,48 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
 
   // Build serve drive modules with encoder channel & offset, and CAN IDs for drive and steering motors
   // Front Left
-  public final PrimeSwerveModuleSubsystem m_frontLeftModule = new PrimeSwerveModuleSubsystem(
+  public final PrimeSwerveModuleSubsystem mFrontLeftModule = new PrimeSwerveModuleSubsystem(
     RobotMap.kFrontLeftDrivingMotorId, 
     RobotMap.kFrontLeftSteeringMotorId, 
     RobotMap.kFrontLeftEncoderAIOChannel,
     RobotMap.kFrontLeftEncoderOffset);
 
   // Front Right
-  public final PrimeSwerveModuleSubsystem m_frontRightModule = new PrimeSwerveModuleSubsystem (
+  public final PrimeSwerveModuleSubsystem mFrontRightModule = new PrimeSwerveModuleSubsystem (
     RobotMap.kFrontRightDrivingMotorId, 
     RobotMap.kFrontRightSteeringMotorId, 
     RobotMap.kFrontRightEncoderAIOChannel, 
     RobotMap.kFrontRightEncoderOffset);
 
   // Rear Left
-  public final PrimeSwerveModuleSubsystem m_rearLeftModule = new PrimeSwerveModuleSubsystem (
+  public final PrimeSwerveModuleSubsystem mRearLeftModule = new PrimeSwerveModuleSubsystem (
     RobotMap.kRearLeftDrivingMotorId, 
     RobotMap.kRearLeftSteeringMotorId, 
     RobotMap.kRearLeftEncoderAIOChannel, 
     RobotMap.kRearLeftEncoderOffset);
 
   // Rear Right
-  public final PrimeSwerveModuleSubsystem m_rearRightModule = new PrimeSwerveModuleSubsystem (
+  public final PrimeSwerveModuleSubsystem mRearRightModule = new PrimeSwerveModuleSubsystem (
     RobotMap.kRearRightDrivingMotorId, 
     RobotMap.kRearRightSteeringMotorId, 
     RobotMap.kRearRightEncoderAIOChannel, 
     RobotMap.kRearRightEncoderOffset);
 
   // Build a gyro and a kinematics class for our drive
-  final AHRS m_gyro = new AHRS(Port.kUSB);
-  final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+  final AHRS mGyro = new AHRS(Port.kUSB);
+  final SwerveDriveKinematics mKinematics = new SwerveDriveKinematics(
     frontLeftLocation, 
     frontRightLocation, 
     rearLeftLocation, 
     rearRightLocation);
 
-    SwerveDriveOdometry m_Odometry = new SwerveDriveOdometry(m_kinematics, 
-      m_gyro.getRotation2d(), 
+    SwerveDriveOdometry mOdometry = new SwerveDriveOdometry(mKinematics, 
+      mGyro.getRotation2d(), 
       new SwerveModulePosition[]{
-        m_frontLeftModule.getPosition(),
-        m_frontRightModule.getPosition(),
-        m_rearLeftModule.getPosition(),
-        m_rearRightModule.getPosition(),
+        mFrontLeftModule.getPosition(),
+        mFrontRightModule.getPosition(),
+        mRearLeftModule.getPosition(),
+        mRearRightModule.getPosition(),
       },
       new Pose2d(0, 0, Rotation2d.fromDegrees(90)));
 
@@ -85,7 +85,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
     
   /** Creates a new SwerveDriveTrainSubsystem. */
   public SwerveDriveTrainSubsystem() {
-    SmartDashboard.putData("Field", m_field);
+    SmartDashboard.putData("Field", mField);
   }
 
  
@@ -94,32 +94,32 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    var gyroAngle = m_gyro.getRotation2d();
+    var gyroAngle = mGyro.getRotation2d();
     SmartDashboard.putNumber("Drivetrain gyro angle", gyroAngle.getDegrees());
 
-    var robotPose = m_Odometry.update(gyroAngle, new SwerveModulePosition[] {
-      m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(),
-      m_rearLeftModule.getPosition(), m_rearRightModule.getPosition()
+    var robotPose = mOdometry.update(gyroAngle, new SwerveModulePosition[] {
+      mFrontLeftModule.getPosition(), mFrontRightModule.getPosition(),
+      mRearLeftModule.getPosition(), mRearRightModule.getPosition()
     });
 
-    m_field.setRobotPose(robotPose);
+    mField.setRobotPose(robotPose);
   }
 
   public void resetGyro() {
-    m_gyro.reset();
+    mGyro.reset();
   }
 
   public void drive(double strafe, double forward, double rotation, boolean fieldRelative) {
     var desiredChassisSpeeds = fieldRelative
-      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, m_gyro.getRotation2d())
+      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, mGyro.getRotation2d())
       : new ChassisSpeeds(strafe, forward, rotation);
 
-    var swerveModuleStates = m_kinematics.toSwerveModuleStates(desiredChassisSpeeds);
+    var swerveModuleStates = mKinematics.toSwerveModuleStates(desiredChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, RobotMap.kDriveMaxSpeedMetersPerSecond);
 
-    m_frontLeftModule.setDesiredState(swerveModuleStates[0]);
-    m_frontRightModule.setDesiredState(swerveModuleStates[1]);
-    m_rearLeftModule.setDesiredState(swerveModuleStates[2]);
-    m_rearRightModule.setDesiredState(swerveModuleStates[3]);
+    mFrontLeftModule.setDesiredState(swerveModuleStates[0]);
+    mFrontRightModule.setDesiredState(swerveModuleStates[1]);
+    mRearLeftModule.setDesiredState(swerveModuleStates[2]);
+    mRearRightModule.setDesiredState(swerveModuleStates[3]);
   }
 }

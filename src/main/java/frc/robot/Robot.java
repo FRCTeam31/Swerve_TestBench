@@ -23,17 +23,9 @@ import frc.robot.subsystems.SwerveDriveTrainSubsystem;
 public class Robot extends TimedRobot {
   private SwerveDriveTrainSubsystem m_swerve;
   private CommandJoystick m_controller;
+  private boolean mDriveShifter = false;
 
   private final double kJoystickDeadband = 0.15;
-
-  // private TalonSRX Talon1;
-  // private WPI_TalonFX Falcon1;
-  // private TalonSRX Talon2;
-  // private CANSparkMax Spark1;
-  // private Solenoid Solenoid1;
-  // private Solenoid Solenoid2;
-  // private Joystick Joystick1;
-  // private Command m_autonomousCommand;
 
   // private RobotContainer m_robotContainer;
 
@@ -50,9 +42,12 @@ public class Robot extends TimedRobot {
     m_controller.button(3).onTrue(Commands.runOnce(() -> {
      m_swerve.resetGyro();
      
-     System.out.printLn("[DRIVE] Reset gyro");
+     System.out.println("[DRIVE] Reset gyro");
     }));
-    
+
+    m_controller.button(2).onTrue(Commands.runOnce(() -> {
+      mDriveShifter = !mDriveShifter;
+    }));
   }
   
 
@@ -106,6 +101,11 @@ public class Robot extends TimedRobot {
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
     var rotation = m_controller.getRawAxis(3) + -m_controller.getRawAxis(2);
 
+    if (!mDriveShifter) {
+      strafeX *= RobotMap.kDriveLowGearCoefficient;
+      forwardY *= RobotMap.kDriveLowGearCoefficient;
+      rotation *= RobotMap.kDriveLowGearCoefficient;
+    }
 
     m_swerve.drive(strafeX, forwardY, rotation, true);
   }

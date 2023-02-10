@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.RobotMap;
@@ -22,6 +23,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
   // Default PID values for steering each module and driving each module
   public static final PidConstants kDrivePidConstants = new PidConstants(0.01);
   public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
+  private final Field2d m_field = new Field2d();
 
   // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
   double halfWheelBase = RobotMap.kRobotWheelBaseMeters / 2;
@@ -80,9 +82,14 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
 
 
     
-
+    
   /** Creates a new SwerveDriveTrainSubsystem. */
-  public SwerveDriveTrainSubsystem() {}
+  public SwerveDriveTrainSubsystem() {
+    SmartDashboard.putData("Field", m_field);
+  }
+
+ 
+
 
   @Override
   public void periodic() {
@@ -94,6 +101,8 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
       m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(),
       m_rearLeftModule.getPosition(), m_rearRightModule.getPosition()
     });
+
+    m_field.setRobotPose(robotPose);
   }
 
   public void resetGyro() {

@@ -18,6 +18,7 @@ public class RobotMap {
   public static final double driveKv = 0.029115;
   public static final double driveKa = 0.0050108;
   public static final double driveKp = 0.0016983;
+  public static final double kDriveLowGearCoefficient = 0.7;
   public static final PidConstants kDrivePidConstants = new PidConstants(driveKp);
 
   public static final double steeringKp = 0.4;

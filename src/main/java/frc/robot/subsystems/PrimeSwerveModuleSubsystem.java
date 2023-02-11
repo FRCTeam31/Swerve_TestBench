@@ -55,13 +55,9 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    // Create a PID controller to calculate steering motor output
 
    mDriveFeedforward = new SimpleMotorFeedforward(RobotMap.driveKs, RobotMap.driveKv, RobotMap.driveKa);
-   // mDrivePIDController = new PIDController(RobotMap.kDrivePidConstants.kP, 0, 0);
+   mDrivePIDController = new PIDController(RobotMap.kDrivePidConstants.kP, 0, 0);
 
-   mSteeringPIDController = new PIDController(
-     RobotMap.kSteeringPidConstants.kP, 
-     RobotMap.kSteeringPidConstants.kI, 
-     RobotMap.kSteeringPidConstants.kD
-   );
+
    getController().enableContinuousInput(-Math.PI, Math.PI);
   //  mSteeringPIDController.setTolerance(0.1);
   enable();
@@ -77,21 +73,22 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    desiredState = SwerveModuleState.optimize(desiredState, encoderRotation);
 
    // Drive motor logic
-   // var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
-   // var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
+      
+   var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
+   var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
    var desiredVelocity = (desiredState.speedMetersPerSecond / 50) * 2048;
-   setSetpoint(desiredVelocity);
-   // var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);
-   // var driveFeedback = getController().calculate(getMeasurement(), desiredVelocity);
-   // var desiredMotorVelocity = driveFeedback + driveFeedForward;
-   // mDriveMotor.set(ControlMode.PercentOutput, MathUtil.applyDeadband(desiredMotorVelocity, 0.15));
+   var driveFeedForward = mDriveFeedforward.calculate(getMeasurement(), desiredVelocity, 0.2);
+
+   var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);
+   var desiredMotorVelocity = driveFeedback + driveFeedForward;
+   
+   mDriveMotor.set(ControlMode.PercentOutput, MathUtil.applyDeadband(desiredMotorVelocity, 0.15));
+   
    
    // Steering motor logic
-   var currentPositionRadians = encoderRotation.getRadians();
    var desiredPositionRadians = desiredState.angle.getRadians();
-   var steeringOutput = -mSteeringPIDController.calculate(currentPositionRadians, desiredPositionRadians);
-   steeringOutput = MathUtil.applyDeadband(steeringOutput, 0.05);
-   mSteeringMotor.set(ControlMode.PercentOutput, MathUtil.clamp(steeringOutput, -1, 1));
+
+   getController().setSetpoint(desiredPositionRadians);
  }
 
  /**
@@ -104,8 +101,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
 
 @Override
 protected void useOutput(double output, double setpoint) {
-   var driveFeedForward = mDriveFeedforward.calculate(getMeasurement(), setpoint, 0.2);
-   mDriveMotor.set(ControlMode.PercentOutput, MathUtil.applyDeadband(output + driveFeedForward, 0.15));
+   mSteeringMotor.set(ControlMode.PercentOutput, MathUtil.clamp(-output, -1, 1));
 }
 
 @Override
@@ -113,8 +109,9 @@ protected double getMeasurement() {
    // TODO Auto-generated method stub
    var encoderRotation = mEncoder.getRotation2d().rotateBy(Rotation2d.fromDegrees(-90));
    var currentPositionRadians = encoderRotation.getRadians();
-
-
    return currentPositionRadians;
+
+
+  
 }
 }

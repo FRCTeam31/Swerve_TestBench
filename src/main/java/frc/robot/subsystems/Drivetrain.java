@@ -11,6 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.DriveMap;
@@ -40,6 +41,8 @@ public class Drivetrain extends SubsystemBase {
       mRearRightModule.getPosition(),
     },
     new Pose2d(0, 0, Rotation2d.fromDegrees(90)));
+
+  Field2d mField = new Field2d();
 
   /** Creates a new SwerveDriveTrainSubsystem. */
   public Drivetrain(SwerveModule flModule, SwerveModule frModule, SwerveModule rlModule, SwerveModule rrModule) {

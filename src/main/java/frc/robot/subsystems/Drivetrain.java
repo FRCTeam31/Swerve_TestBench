@@ -1,116 +1,65 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.DriveMap;
-import frc.robot.sensors.MA3Encoder;
-import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+import frc.robot.models.PidConstants;
+import frc.robot.sensors.navx.AHRS;
 
-public class Drivetrain extends PIDSubsystem {
- private WPI_TalonFX mSteeringMotor;
- private WPI_TalonFX mDriveMotor;
- public MA3Encoder mEncoder;
- private PIDController mSteeringPIDController;   
- private PIDController mDrivePIDController;
- private SimpleMotorFeedforward mDriveFeedforward;   
+public class Drivetrain extends SubsystemBase {
+  // Default PID values for steering each module and driving each module
+  public static final PidConstants kDrivePidConstants = new PidConstants(0.01);
+  public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
 
- public Drivetrain (
-    int driveMotorId,
-    int steeringMotorId,
-    int encoderAioChannel,
-    int encoderBasePositionOffset
- ){
-   super(new PIDController(DriveMap.kSteeringPidConstants.kP, DriveMap.kSteeringPidConstants.kI, DriveMap.kSteeringPidConstants.kD));
+  private SwerveModule m_frontLeftModule;
+  private SwerveModule m_frontRightModule;
+  private SwerveModule m_rearLeftModule;
+  private SwerveModule m_rearRightModule;
 
-   // Set up the steering motor
-   mSteeringMotor = new WPI_TalonFX(steeringMotorId);
-   mSteeringMotor.configFactoryDefault();
-   mSteeringMotor.clearStickyFaults();
-   mSteeringMotor.setNeutralMode(NeutralMode.Brake);
-   mSteeringMotor.setInverted(TalonFXInvertType.Clockwise);
-   mSteeringMotor.configOpenloopRamp(0.2);
+  // Build a gyro and a kinematics class for our drive
+  final AHRS m_gyro = new AHRS(Port.kUSB);
+  final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+    DriveMap.frontLeftLocation, 
+    DriveMap.frontRightLocation, 
+    DriveMap.rearLeftLocation, 
+    DriveMap.rearRightLocation);
 
-   // Set up the drive motor
-   mDriveMotor = new WPI_TalonFX(driveMotorId);
-   mDriveMotor.configFactoryDefault();
-   mDriveMotor.clearStickyFaults();
-   mDriveMotor.setNeutralMode(NeutralMode.Brake);
-   mDriveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor); // The integrated sensor in the Falcon is the falcon's encoder
-   mDriveMotor.configOpenloopRamp(0.2);
-   mDriveMotor.setInverted(TalonFXInvertType.Clockwise);
+  /** Creates a new SwerveDriveTrainSubsystem. */
+  public Drivetrain(SwerveModule flModule, SwerveModule frModule, SwerveModule rlModule, SwerveModule rrModule) {
+    m_frontLeftModule = flModule;
+    m_frontRightModule = frModule;
+    m_rearLeftModule = rlModule;
+    m_rearRightModule = rrModule;
+  }
 
-   // Set up our encoder
-   mEncoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset, true);
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Drivetrain gyro angle", m_gyro.getAngle());
+  }
 
-   // Create a PID controller to calculate steering motor output
-   mDriveFeedforward = new SimpleMotorFeedforward(DriveMap.driveKs, DriveMap.driveKv, DriveMap.driveKa);
-   mDrivePIDController = new PIDController(DriveMap.kDrivePidConstants.kP, 0, 0);
+  public void resetGyro() {
+    m_gyro.reset();
+  }
 
-   mSteeringPIDController = new PIDController(
-     DriveMap.kSteeringPidConstants.kP, 
-     DriveMap.kSteeringPidConstants.kI, 
-     DriveMap.kSteeringPidConstants.kD
-   );
-   getController().enableContinuousInput(-Math.PI, Math.PI);
-  //  mSteeringPIDController.setTolerance(0.1);
- }
+  public void drive(double strafe, double forward, double rotation, boolean fieldRelative) {
+    var desiredChassisSpeeds = fieldRelative
+      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, m_gyro.getRotation2d())
+      : new ChassisSpeeds(strafe, forward, rotation);
 
- /**
-  * Sets the desired state of the module.
-  * @param desiredState The state of the module that we'd like to be at in this period
-  */
- public void setDesiredState(SwerveModuleState desiredState){
-   // Optimize the state to avoid turning wheels further than 90 degrees
-   var encoderRotation = mEncoder.getRotation2d().rotateBy(Rotation2d.fromDegrees(-90));
-   desiredState = SwerveModuleState.optimize(desiredState, encoderRotation);
+    var swerveModuleStates = m_kinematics.toSwerveModuleStates(desiredChassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveMap.kDriveMaxSpeedMetersPerSecond);
 
-   // Drive motor logic
-   var currentVelocityInRotationsPer20ms = DriveMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
-   var currentVelocityInMetersPer20ms = DriveMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
-   var desiredVelocity = (desiredState.speedMetersPerSecond / 50) * 2048;
-   var driveFeedforward = mDriveFeedforward.calculate(currentVelocityInMetersPer20ms, desiredVelocity, 0.2);
-   var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);
-   var desiredMotorVelocity = driveFeedback + driveFeedforward;
-   mDriveMotor.set(ControlMode.PercentOutput, MathUtil.applyDeadband(desiredMotorVelocity, 0.15));
-   
-   // Steering motor logic
-   var currentPositionRadians = encoderRotation.getRadians();
-   var desiredPositionRadians = desiredState.angle.getRadians();
-   var steeringOutput = -mSteeringPIDController.calculate(currentPositionRadians, desiredPositionRadians);
-   steeringOutput = MathUtil.applyDeadband(steeringOutput, 0.1);
-   mSteeringMotor.set(ControlMode.PercentOutput, MathUtil.clamp(steeringOutput, -1, 1));
- }
-
- /**
-  * Used for testing
-  */
- public void driveSimple(double fwd, double rot){
-    mDriveMotor.set(fwd);
-    mSteeringMotor.set(rot);
- }
-
-@Override
-protected void useOutput(double output, double setpoint) {
-   // TODO Auto-generated method stub
-   
-}
-
-@Override
-protected double getMeasurement() {
-   // TODO Auto-generated method stub
-   var encoderRotation = mEncoder.getRotation2d().rotateBy(Rotation2d.fromDegrees(-90));
-   var currentPositionRadians = encoderRotation.getRadians();
-
-
-   return currentPositionRadians;
-}
+    m_frontLeftModule.setDesiredState(swerveModuleStates[0]);
+    m_frontRightModule.setDesiredState(swerveModuleStates[1]);
+    m_rearLeftModule.setDesiredState(swerveModuleStates[2]);
+    m_rearRightModule.setDesiredState(swerveModuleStates[3]);
+  }
 }

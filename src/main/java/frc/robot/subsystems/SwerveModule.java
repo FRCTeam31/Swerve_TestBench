@@ -1,93 +1,116 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.SerialPort.Port;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.config.DriveMap;
-import frc.robot.models.PidConstants;
-import frc.robot.sensors.navx.AHRS;
+import frc.robot.sensors.MA3Encoder;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
-public class SwerveModule extends SubsystemBase {
-  // Default PID values for steering each module and driving each module
-  public static final PidConstants kDrivePidConstants = new PidConstants(0.01);
-  public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
+public class SwerveModule extends PIDSubsystem {
+ private WPI_TalonFX mSteeringMotor;
+ private WPI_TalonFX mDriveMotor;
+ public MA3Encoder mEncoder;
+ private PIDController mSteeringPIDController;   
+ private PIDController mDrivePIDController;
+ private SimpleMotorFeedforward mDriveFeedforward;   
 
-  // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
-  double halfWheelBase = DriveMap.kRobotWheelBaseMeters / 2;
-  double halfTrackWidth = DriveMap.kRobotTrackWidthMeters / 2;
-  final Translation2d frontLeftLocation =   new Translation2d(-halfTrackWidth, halfWheelBase);
-  final Translation2d frontRightLocation =  new Translation2d(halfTrackWidth,  halfWheelBase);
-  final Translation2d rearLeftLocation =    new Translation2d(-halfTrackWidth, -halfWheelBase);
-  final Translation2d rearRightLocation =   new Translation2d(halfTrackWidth,  -halfWheelBase);
+ public SwerveModule (
+    int driveMotorId,
+    int steeringMotorId,
+    int encoderAioChannel,
+    int encoderBasePositionOffset
+ ){
+   super(new PIDController(DriveMap.kSteeringPidConstants.kP, DriveMap.kSteeringPidConstants.kI, DriveMap.kSteeringPidConstants.kD));
 
-  // Build serve drive modules with encoder channel & offset, and CAN IDs for drive and steering motors
-  // Front Left
-  public final Drivetrain m_frontLeftModule = new Drivetrain(
-    DriveMap.kFrontLeftDrivingMotorId, 
-    DriveMap.kFrontLeftSteeringMotorId, 
-    DriveMap.kFrontLeftEncoderAIOChannel,
-    DriveMap.kFrontLeftEncoderOffset);
+   // Set up the steering motor
+   mSteeringMotor = new WPI_TalonFX(steeringMotorId);
+   mSteeringMotor.configFactoryDefault();
+   mSteeringMotor.clearStickyFaults();
+   mSteeringMotor.setNeutralMode(NeutralMode.Brake);
+   mSteeringMotor.setInverted(TalonFXInvertType.Clockwise);
+   mSteeringMotor.configOpenloopRamp(0.2);
 
-  // Front Right
-  public final Drivetrain m_frontRightModule = new Drivetrain (
-    DriveMap.kFrontRightDrivingMotorId, 
-    DriveMap.kFrontRightSteeringMotorId, 
-    DriveMap.kFrontRightEncoderAIOChannel, 
-    DriveMap.kFrontRightEncoderOffset);
+   // Set up the drive motor
+   mDriveMotor = new WPI_TalonFX(driveMotorId);
+   mDriveMotor.configFactoryDefault();
+   mDriveMotor.clearStickyFaults();
+   mDriveMotor.setNeutralMode(NeutralMode.Brake);
+   mDriveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor); // The integrated sensor in the Falcon is the falcon's encoder
+   mDriveMotor.configOpenloopRamp(0.2);
+   mDriveMotor.setInverted(TalonFXInvertType.Clockwise);
 
-  // Rear Left
-  public final Drivetrain m_rearLeftModule = new Drivetrain (
-    DriveMap.kRearLeftDrivingMotorId, 
-    DriveMap.kRearLeftSteeringMotorId, 
-    DriveMap.kRearLeftEncoderAIOChannel, 
-    DriveMap.kRearLeftEncoderOffset);
+   // Set up our encoder
+   mEncoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset, true);
 
-  // Rear Right
-  public final Drivetrain m_rearRightModule = new Drivetrain (
-    DriveMap.kRearRightDrivingMotorId, 
-    DriveMap.kRearRightSteeringMotorId, 
-    DriveMap.kRearRightEncoderAIOChannel, 
-    DriveMap.kRearRightEncoderOffset);
+   // Create a PID controller to calculate steering motor output
+   mDriveFeedforward = new SimpleMotorFeedforward(DriveMap.driveKs, DriveMap.driveKv, DriveMap.driveKa);
+   mDrivePIDController = new PIDController(DriveMap.kDrivePidConstants.kP, 0, 0);
 
-  // Build a gyro and a kinematics class for our drive
-  final AHRS m_gyro = new AHRS(Port.kUSB);
-  final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-    frontLeftLocation, 
-    frontRightLocation, 
-    rearLeftLocation, 
-    rearRightLocation);
+   mSteeringPIDController = new PIDController(
+     DriveMap.kSteeringPidConstants.kP, 
+     DriveMap.kSteeringPidConstants.kI, 
+     DriveMap.kSteeringPidConstants.kD
+   );
+   getController().enableContinuousInput(-Math.PI, Math.PI);
+  //  mSteeringPIDController.setTolerance(0.1);
+ }
 
-  /** Creates a new SwerveDriveTrainSubsystem. */
-  public SwerveModule() {}
+ /**
+  * Sets the desired state of the module.
+  * @param desiredState The state of the module that we'd like to be at in this period
+  */
+ public void setDesiredState(SwerveModuleState desiredState){
+   // Optimize the state to avoid turning wheels further than 90 degrees
+   var encoderRotation = mEncoder.getRotation2d().rotateBy(Rotation2d.fromDegrees(-90));
+   desiredState = SwerveModuleState.optimize(desiredState, encoderRotation);
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Drivetrain gyro angle", m_gyro.getAngle());
-  }
+   // Drive motor logic
+   var currentVelocityInRotationsPer20ms = DriveMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
+   var currentVelocityInMetersPer20ms = DriveMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
+   var desiredVelocity = (desiredState.speedMetersPerSecond / 50) * 2048;
+   var driveFeedforward = mDriveFeedforward.calculate(currentVelocityInMetersPer20ms, desiredVelocity, 0.2);
+   var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);
+   var desiredMotorVelocity = driveFeedback + driveFeedforward;
+   mDriveMotor.set(ControlMode.PercentOutput, MathUtil.applyDeadband(desiredMotorVelocity, 0.15));
+   
+   // Steering motor logic
+   var currentPositionRadians = encoderRotation.getRadians();
+   var desiredPositionRadians = desiredState.angle.getRadians();
+   var steeringOutput = -mSteeringPIDController.calculate(currentPositionRadians, desiredPositionRadians);
+   steeringOutput = MathUtil.applyDeadband(steeringOutput, 0.1);
+   mSteeringMotor.set(ControlMode.PercentOutput, MathUtil.clamp(steeringOutput, -1, 1));
+ }
 
-  public void resetGyro() {
-    m_gyro.reset();
-  }
+ /**
+  * Used for testing
+  */
+ public void driveSimple(double fwd, double rot){
+    mDriveMotor.set(fwd);
+    mSteeringMotor.set(rot);
+ }
 
-  public void drive(double strafe, double forward, double rotation, boolean fieldRelative) {
-    var desiredChassisSpeeds = fieldRelative
-      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, m_gyro.getRotation2d())
-      : new ChassisSpeeds(strafe, forward, rotation);
+@Override
+protected void useOutput(double output, double setpoint) {
+   // TODO Auto-generated method stub
+   
+}
 
-    var swerveModuleStates = m_kinematics.toSwerveModuleStates(desiredChassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveMap.kDriveMaxSpeedMetersPerSecond);
+@Override
+protected double getMeasurement() {
+   // TODO Auto-generated method stub
+   var encoderRotation = mEncoder.getRotation2d().rotateBy(Rotation2d.fromDegrees(-90));
+   var currentPositionRadians = encoderRotation.getRadians();
 
-    m_frontLeftModule.setDesiredState(swerveModuleStates[0]);
-    m_frontRightModule.setDesiredState(swerveModuleStates[1]);
-    m_rearLeftModule.setDesiredState(swerveModuleStates[2]);
-    m_rearRightModule.setDesiredState(swerveModuleStates[3]);
-  }
+
+   return currentPositionRadians;
+}
 }

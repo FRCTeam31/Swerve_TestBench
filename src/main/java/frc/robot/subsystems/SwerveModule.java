@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.config.DriveMap;
 import frc.robot.sensors.MA3Encoder;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveModule extends PIDSubsystem {
  private WPI_TalonFX mSteeringMotor;

@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,48 +18,66 @@ import frc.robot.sensors.navx.AHRS;
 
 public class Drivetrain extends SubsystemBase {
   // Default PID values for steering each module and driving each module
-  private SwerveModule m_frontLeftModule;
-  private SwerveModule m_frontRightModule;
-  private SwerveModule m_rearLeftModule;
-  private SwerveModule m_rearRightModule;
+  private SwerveModule mFrontLeftModule;
+  private SwerveModule mFrontRightModule;
+  private SwerveModule mRearLeftModule;
+  private SwerveModule mRearRightModule;
 
   // Build a gyro and a kinematics class for our drive
-  final AHRS m_gyro = new AHRS(Port.kUSB);
-  final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+  final AHRS mGyro = new AHRS(Port.kUSB);
+  final SwerveDriveKinematics mKinematics = new SwerveDriveKinematics(
     DriveMap.frontLeftLocation, 
     DriveMap.frontRightLocation, 
     DriveMap.rearLeftLocation, 
     DriveMap.rearRightLocation);
 
+  SwerveDriveOdometry mOdometry = new SwerveDriveOdometry(mKinematics, 
+    mGyro.getRotation2d(), 
+    new SwerveModulePosition[]{
+      mFrontLeftModule.getPosition(),
+      mFrontRightModule.getPosition(),
+      mRearLeftModule.getPosition(),
+      mRearRightModule.getPosition(),
+    },
+    new Pose2d(0, 0, Rotation2d.fromDegrees(90)));
+
   /** Creates a new SwerveDriveTrainSubsystem. */
   public Drivetrain(SwerveModule flModule, SwerveModule frModule, SwerveModule rlModule, SwerveModule rrModule) {
-    m_frontLeftModule = flModule;
-    m_frontRightModule = frModule;
-    m_rearLeftModule = rlModule;
-    m_rearRightModule = rrModule;
+    mFrontLeftModule = flModule;
+    mFrontRightModule = frModule;
+    mRearLeftModule = rlModule;
+    mRearRightModule = rrModule;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Drivetrain gyro angle", m_gyro.getAngle());
+    var gyroAngle = mGyro.getRotation2d();
+    SmartDashboard.putNumber("Drivetrain gyro angle", gyroAngle.getDegrees());
+
+    var robotPose = mOdometry.update(gyroAngle, new SwerveModulePosition[] {
+      mFrontLeftModule.getPosition(), mFrontRightModule.getPosition(),
+      mRearLeftModule.getPosition(), mRearRightModule.getPosition()
+    });
+
+    mField.setRobotPose(robotPose);
   }
 
   public void resetGyro() {
-    m_gyro.reset();
+    mGyro.reset();
   }
 
   public void drive(double strafe, double forward, double rotation, boolean fieldRelative) {
     var desiredChassisSpeeds = fieldRelative
-      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, m_gyro.getRotation2d())
+      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, mGyro.getRotation2d())
       : new ChassisSpeeds(strafe, forward, rotation);
 
-    var swerveModuleStates = m_kinematics.toSwerveModuleStates(desiredChassisSpeeds);
+    var swerveModuleStates = mKinematics.toSwerveModuleStates(desiredChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveMap.kDriveMaxSpeedMetersPerSecond);
 
-    m_frontLeftModule.setDesiredState(swerveModuleStates[0]);
-    m_frontRightModule.setDesiredState(swerveModuleStates[1]);
-    m_rearLeftModule.setDesiredState(swerveModuleStates[2]);
-    m_rearRightModule.setDesiredState(swerveModuleStates[3]);
+    mFrontLeftModule.setDesiredState(swerveModuleStates[0]);
+    mFrontRightModule.setDesiredState(swerveModuleStates[1]);
+    mRearLeftModule.setDesiredState(swerveModuleStates[2]);
+    mRearRightModule.setDesiredState(swerveModuleStates[3]);
   }
 }

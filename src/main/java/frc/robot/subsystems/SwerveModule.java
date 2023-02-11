@@ -14,7 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.config.DriveMap;
 import frc.robot.sensors.MA3Encoder;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveModule extends PIDSubsystem {
  private WPI_TalonFX mSteeringMotor;
@@ -101,13 +100,11 @@ public class SwerveModule extends PIDSubsystem {
 
 @Override
 protected void useOutput(double output, double setpoint) {
-   // TODO Auto-generated method stub
    
 }
 
 @Override
 protected double getMeasurement() {
-   // TODO Auto-generated method stub
    var encoderRotation = mEncoder.getRotation2d().rotateBy(Rotation2d.fromDegrees(-90));
    var currentPositionRadians = encoderRotation.getRadians();
 

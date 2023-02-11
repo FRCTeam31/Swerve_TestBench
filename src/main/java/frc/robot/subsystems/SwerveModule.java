@@ -54,7 +54,7 @@ public class SwerveModule extends PIDSubsystem {
    mEncoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset, true);
 
    // Create a PID controller to calculate steering motor output
-   mDriveFeedforward = new SimpleMotorFeedforward(DriveMap.driveKs, DriveMap.driveKv, DriveMap.driveKa);
+   mDriveFeedforward = new SimpleMotorFeedforward(DriveMap.kDriveFeedForwardConstants.kS, DriveMap.kDriveFeedForwardConstants.kV, DriveMap.kDriveFeedForwardConstants.kA);
    mDrivePIDController = new PIDController(DriveMap.kDrivePidConstants.kP, 0, 0);
 
    mSteeringPIDController = new PIDController(

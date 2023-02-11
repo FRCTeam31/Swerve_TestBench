@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -12,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.subsystems.SwerveDriveTrainSubsystem;
 
 public class Robot extends TimedRobot {
-  private SwerveDriveTrainSubsystem m_swerve;
-  private CommandJoystick m_controller;
+  private SwerveDriveTrainSubsystem mSwerve;
+  private CommandJoystick mController;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -21,11 +22,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_controller = new CommandJoystick(0);
-    m_swerve = new SwerveDriveTrainSubsystem();
+    mController = new CommandJoystick(0);
+    mSwerve = new SwerveDriveTrainSubsystem();
 
-    m_controller.button(3).onTrue(Commands.runOnce(() -> {
-     m_swerve.resetGyro();
+    mController.button(3).onTrue(Commands.runOnce(() -> {
+     mSwerve.resetGyro();
      
      System.out.println("[DRIVE] Reset gyro");
     }));
@@ -46,19 +47,19 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    SmartDashboard.putNumber("Front Right Encoder Value", m_swerve.m_frontRightModule.mEncoder.getRawValue());
-    SmartDashboard.putNumber("Front Left Encoder Value", m_swerve.m_frontLeftModule.mEncoder.getRawValue());
-    SmartDashboard.putNumber("Rear Right Encoder Value", m_swerve.m_rearRightModule.mEncoder.getRawValue());
-    SmartDashboard.putNumber("Rear Left Encoder Value",  m_swerve.m_rearLeftModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Front Right Encoder Value", mSwerve.mFrontRightModule.mEncoder.getRawValue()); 
+    SmartDashboard.putNumber("Front Left Encoder Value", mSwerve.mFrontLeftModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Rear Right Encoder Value", mSwerve.mRearRightModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Rear Left Encoder Value",  mSwerve.mRearLeftModule.mEncoder.getRawValue());
   }
 
   @Override
   public void teleopInit() {
     // if (m_autonomousCommand != null) {
-    //   m_autonomousCommand.cancel();
+    //   m_autonomousCommand.cancel(); 
     // }
 
-    m_swerve.resetGyro();
+    mSwerve.resetGyro();  
   }
 
   /** This function is called periodically during operator control. */
@@ -69,13 +70,13 @@ public class Robot extends TimedRobot {
 
   private void driveWithJoystick(boolean fieldRelative) {
     // Grab the X and Y axis from the left joystick on the controller
-    var strafeX = m_controller.getRawAxis(0);
-    var forwardY = -m_controller.getRawAxis(1);
+    var strafeX = mController.getRawAxis(0);
+    var forwardY = -mController.getRawAxis(1);
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = m_controller.getRawAxis(2) + -m_controller.getRawAxis(3);
+    var rotation = mController.getRawAxis(2) + -mController.getRawAxis(3);
 
-    m_swerve.drive(strafeX, forwardY, rotation, true);
+    mSwerve.drive(strafeX, forwardY, rotation, true);
   }
 }

@@ -10,14 +10,10 @@ import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.DriveMap;
-import frc.robot.models.PidConstants;
 import frc.robot.sensors.navx.AHRS;
 
 public class Drivetrain extends SubsystemBase {
   // Default PID values for steering each module and driving each module
-  public static final PidConstants kDrivePidConstants = new PidConstants(0.01);
-  public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
-
   private SwerveModule m_frontLeftModule;
   private SwerveModule m_frontRightModule;
   private SwerveModule m_rearLeftModule;

@@ -17,8 +17,9 @@ public class RobotMap {
   public static final double driveKs = -0.13939;
   public static final double driveKv = 0.029115;
   public static final double driveKa = 0.0050108;
-  public static final double driveKp = 0.0016983;
-  public static final PidConstants kDrivePidConstants = new PidConstants(driveKp);
+  public static final double driveKf = 0;
+
+  public static final PidConstants kDrivePidConstants = new PidConstants(0.0016983);
 
   public static final double steeringKp = 0.4;
   public static final double steeringKi = 0;
@@ -82,6 +83,8 @@ public class RobotMap {
   public static byte driveMotorOutputTeeth = 13;
   public static byte driveMotorDriveGearTeeth = 42;
   // public static final double kDriveMaxSpeedMetersPerSecond = 0.27432; // in meters per second
+  public static int kdriveMaxSpeedInFalconSensorUnits = 8192;
+  
   public static final double kDriveMaxSpeedMetersPerSecond = 4.938; // 16.2ft per second in meters per second
   public static final double kDriveMaxAngularSpeed = RobotMap.kRobotWheelBaseCircumference / kDriveMaxSpeedMetersPerSecond; // 180 degrees per second, half rotation
 }

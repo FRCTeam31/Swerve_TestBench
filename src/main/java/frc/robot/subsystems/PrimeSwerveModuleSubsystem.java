@@ -88,9 +88,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
       
    var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
    var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
-   var desiredVelocity = (desiredState.speedMetersPerSecond / 50) * 2048;
-   var driveFeedForward = mDriveFeedforward.calculate(getMeasurement(), desiredVelocity, 0.2);
-
+   var desiredVelocity = (desiredState.speedMetersPerSecond / 50) * 2048;   var driveFeedForward = mDriveFeedforward.calculate(currentVelocityInMetersPer20ms, desiredVelocity, 0.2);
    var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);
    var desiredMotorVelocity = driveFeedback + driveFeedForward;
    

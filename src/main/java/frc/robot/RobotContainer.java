@@ -62,10 +62,7 @@ public class RobotContainer {
         }, mDrivetrain, mFrontLeftSwerve, mFrontRightSwerve, mRearLeftSwerve, mRearRightSwerve));
 
         // Button bindings
-        mController.button(3).onTrue(Commands.runOnce(() -> {
-            mDrivetrain.resetGyro();
-            System.out.println("[DRIVE] Reset gyro");
-        }));
+        mController.button(3).onTrue(Commands.runOnce(() -> mDrivetrain.resetGyro()));
     }
 
     public Command getAutonomousCommand() {

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.DriveMap;
 import frc.robot.sensors.navx.AHRS;
+import frc.robot.utilities.EventLogger;
 
 public class Drivetrain extends SubsystemBase {
   // Default PID values for steering each module and driving each module
@@ -46,6 +47,7 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new SwerveDriveTrainSubsystem. */
   public Drivetrain(SwerveModule flModule, SwerveModule frModule, SwerveModule rlModule, SwerveModule rrModule) {
+    setName("DRIVE");
     mFrontLeftModule = flModule;
     mFrontRightModule = frModule;
     mRearLeftModule = rlModule;
@@ -68,6 +70,7 @@ public class Drivetrain extends SubsystemBase {
 
   public void resetGyro() {
     mGyro.reset();
+    EventLogger.Information(getName(), "Reset gyro");
   }
 
   public void drive(double strafe, double forward, double rotation, boolean fieldRelative) {

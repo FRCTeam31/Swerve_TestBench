@@ -1,4 +1,4 @@
-package frc.robot.prime.models;
+package frc.robot.models;
 
 public class PidConstants {
   public double kP = 0;

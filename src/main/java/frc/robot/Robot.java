@@ -4,32 +4,16 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.config.RobotMap;
-import frc.robot.prime.drive.swerve.PrimeSwerveDriveTrain;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import frc.robot.subsystems.SwerveModule;
 
 public class Robot extends TimedRobot {
-  private PrimeSwerveDriveTrain m_swerve;
-  private Joystick m_controller;
-
-  private final double kJoystickDeadband = 0.15;
-
-  // private TalonSRX Talon1;
-  // private WPI_TalonFX Falcon1;
-  // private TalonSRX Talon2;
-  // private CANSparkMax Spark1;
-  // private Solenoid Solenoid1;
-  // private Solenoid Solenoid2;
-  // private Joystick Joystick1;
-  // private Command m_autonomousCommand;
-
-  // private RobotContainer m_robotContainer;
-
+  private SwerveModule m_swerve;
+  private CommandJoystick m_controller;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -37,14 +21,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    // Talon1 = new TalonSRX(RobotMap.TALON_1_ID);
-    // Falcon1 = new WPI_TalonFX(RobotMap.FALCON_2_ID);
-    // Talon2 = new TalonSRX(RobotMap.TALON_2_ID);
-    // Solenoid1 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLENOID_1_ID);
-    // Solenoid2 = new Solenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOlENOID_2_ID);
-    m_controller = new Joystick(0);
-    // Spark1 = new CANSparkMax(RobotMap.SPARK_1_ID, MotorType.kBrushless);
-    m_swerve = new PrimeSwerveDriveTrain();
+    m_controller = new CommandJoystick(0);
+    m_swerve = new SwerveModule();
+
+    m_controller.button(3).onTrue(Commands.runOnce(() -> {
+     m_swerve.resetGyro();
+     
+     System.out.println("[DRIVE] Reset gyro");
+    }));
+
   }
 
   /**
@@ -57,10 +42,18 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    SmartDashboard.putNumber("Front Right Encoder Value", m_swerve.m_frontRightModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Front Left Encoder Value", m_swerve.m_frontLeftModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Rear Right Encoder Value", m_swerve.m_rearRightModule.mEncoder.getRawValue());
+    SmartDashboard.putNumber("Rear Left Encoder Value",  m_swerve.m_rearLeftModule.mEncoder.getRawValue());
   }
 
   @Override
   public void teleopInit() {
+    // if (m_autonomousCommand != null) {
+    //   m_autonomousCommand.cancel();
+    // }
+
     m_swerve.resetGyro();
   }
 
@@ -68,23 +61,17 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driveWithJoystick(true);
-
-    SmartDashboard.putNumber("Front Right Encoder Offset", RobotMap.kFrontLeftEncoderOffset);
-    SmartDashboard.putNumber("Front Left Encoder Offset", RobotMap.kFrontRightEncoderOffset);
-    SmartDashboard.putNumber("Rear Right Encoder Offset", RobotMap.kRearRightEncoderOffset);
-    SmartDashboard.putNumber("Rear Left Encoder Offset", RobotMap.kRearLeftEncoderOffset);
   }
 
   private void driveWithJoystick(boolean fieldRelative) {
     // Grab the X and Y axis from the left joystick on the controller
-    var strafeX = MathUtil.applyDeadband(m_controller.getRawAxis(0), kJoystickDeadband);
-    var forwardY = -1 * MathUtil.applyDeadband(m_controller.getRawAxis(1), kJoystickDeadband);
+    var strafeX = m_controller.getRawAxis(0);
+    var forwardY = -m_controller.getRawAxis(1);
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = MathUtil.applyDeadband((m_controller.getRawAxis(3) - m_controller.getRawAxis(2)),
-      kJoystickDeadband);
+    var rotation = m_controller.getRawAxis(2) + -m_controller.getRawAxis(3);
 
-    m_swerve.drive(forwardY, strafeX, rotation, false);
+    m_swerve.drive(strafeX, forwardY, rotation, true);
   }
 }

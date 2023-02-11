@@ -17,29 +17,29 @@ public class RobotContainer {
 
     public RobotContainer() {
         mFrontLeftSwerve = new SwerveModule(
-            CANMap.kFrontLeftDrivingMotorId, 
-            CANMap.kFrontLeftSteeringMotorId, 
-            DriveMap.kFrontLeftEncoderAIOChannel,
-            DriveMap.kFrontLeftEncoderOffset);
+                CANMap.kFrontLeftDrivingMotorId,
+                CANMap.kFrontLeftSteeringMotorId,
+                DriveMap.kFrontLeftEncoderAIOChannel,
+                DriveMap.kFrontLeftEncoderOffset);
 
         mFrontRightSwerve = new SwerveModule(
-            CANMap.kFrontRightDrivingMotorId, 
-            CANMap.kFrontRightSteeringMotorId, 
-            DriveMap.kFrontRightEncoderAIOChannel, 
-            DriveMap.kFrontRightEncoderOffset);
+                CANMap.kFrontRightDrivingMotorId,
+                CANMap.kFrontRightSteeringMotorId,
+                DriveMap.kFrontRightEncoderAIOChannel,
+                DriveMap.kFrontRightEncoderOffset);
 
         mRearLeftSwerve = new SwerveModule(
-            CANMap.kRearLeftDrivingMotorId, 
-            CANMap.kRearLeftSteeringMotorId, 
-            DriveMap.kRearLeftEncoderAIOChannel, 
-            DriveMap.kRearLeftEncoderOffset);
+                CANMap.kRearLeftDrivingMotorId,
+                CANMap.kRearLeftSteeringMotorId,
+                DriveMap.kRearLeftEncoderAIOChannel,
+                DriveMap.kRearLeftEncoderOffset);
 
         mRearRightSwerve = new SwerveModule(
-            CANMap.kRearRightDrivingMotorId, 
-            CANMap.kRearRightSteeringMotorId, 
-            DriveMap.kRearRightEncoderAIOChannel, 
-            DriveMap.kRearRightEncoderOffset);
-        
+                CANMap.kRearRightDrivingMotorId,
+                CANMap.kRearRightSteeringMotorId,
+                DriveMap.kRearRightEncoderAIOChannel,
+                DriveMap.kRearRightEncoderOffset);
+
         mDrivetrain = new Drivetrain(mFrontLeftSwerve, mFrontRightSwerve, mRearLeftSwerve, mRearRightSwerve);
 
         configureBindings();

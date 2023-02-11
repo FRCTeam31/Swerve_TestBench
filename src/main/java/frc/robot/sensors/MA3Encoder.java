@@ -19,16 +19,16 @@ public class MA3Encoder extends AnalogInput {
         var valWithOffset = super.getValue() - BasePositionOffset;
 
         return mInverted
-            ? kPositionsPerRotation - valWithOffset
-            : valWithOffset;
+                ? kPositionsPerRotation - valWithOffset
+                : valWithOffset;
     }
 
     public int getRawValue() {
         return super.getValue();
     }
-    
+
     public double getAngle() {
-        return ((double)getValue() / (double)kPositionsPerRotation) * 360d;
+        return ((double) getValue() / (double) kPositionsPerRotation) * 360d;
     }
 
     public Rotation2d getRotation2d() {

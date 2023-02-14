@@ -65,7 +65,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
 
 
 
-   // mDriveFeedforward = new SimpleMotorFeedforward(RobotMap.driveKs, RobotMap.driveKv, RobotMap.driveKa);
+   mDriveFeedforward = new SimpleMotorFeedforward(RobotMap.driveKs, RobotMap.driveKv, RobotMap.driveKa);
    // mDrivePIDController = new PIDController(RobotMap.kDrivePidConstants.kP, 0, 0);
 
 
@@ -99,7 +99,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
    var desiredVelocity20ms = (desiredState.speedMetersPerSecond / 50) * 2048; 
    var desiredRotationsPer20ms = desiredVelocity20ms / RobotMap.kDriveWheelCircumference;
-   var desiredVelocity = (desiredRotationsPer20ms * 2048) * 5;
+   var desiredVelocity = (desiredRotationsPer20ms * 2048 * 5);
 
    mDriveMotor.set(ControlMode.Velocity, desiredVelocity);  
    // Steering motor logic

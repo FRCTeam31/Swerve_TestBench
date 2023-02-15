@@ -73,8 +73,8 @@ public class Robot extends TimedRobot {
 
   private void driveWithJoystick(boolean fieldRelative) {
     // Grab the X and Y axis from the left joystick on the controller
-    // var strafeX = MathUtil.applyDeadband(mController.getRawAxis(0), 0.1 );
-    var strafeX = mController.getRawAxis(0);
+    var strafeX = MathUtil.applyDeadband(mController.getRawAxis(0), 0.1 );
+    // var strafeX = mController.getRawAxis(0);
     var forwardY = -mController.getRawAxis(1);
 
     // Right trigger should rotate the robot clockwise, left counterclockwise

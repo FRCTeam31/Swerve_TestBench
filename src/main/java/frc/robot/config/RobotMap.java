@@ -19,7 +19,7 @@ public class RobotMap {
   public static final double driveKa = 0.0050108;
   public static final double driveKf = 0;
 
-  public static final PidConstants kDrivePidConstants = new PidConstants(0.0016983);
+  public static final PidConstants kDrivePidConstants = new PidConstants(0.0016983 * 0.7);
 
   public static final double steeringKp = 0.4;
   public static final double steeringKi = 0;

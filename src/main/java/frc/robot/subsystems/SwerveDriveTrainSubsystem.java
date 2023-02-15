@@ -22,7 +22,7 @@ import frc.robot.sensors.navx.AHRS;
 public class SwerveDriveTrainSubsystem extends SubsystemBase {
 
   // Default PID values for steering each module and driving each module
-  public static final PidConstants kDrivePidConstants = new PidConstants(0.01);
+  public static final PidConstants kDrivePidConstants = new PidConstants(0.1);
   public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
   private final Field2d mField = new Field2d();
   private Rotation2d gyroAngle;

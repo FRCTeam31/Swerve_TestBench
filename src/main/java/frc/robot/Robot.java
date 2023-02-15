@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,11 +26,12 @@ public class Robot extends TimedRobot {
     mController = new CommandJoystick(0);
     mSwerve = new SwerveDriveTrainSubsystem();
 
-    mController.button(3).onTrue(Commands.runOnce(() -> {
-     mSwerve.resetGyro();
+    // mController.button(3).onTrue(Commands.runOnce(() -> {
+    //  mSwerve.resetGyro();
      
-     System.out.println("[DRIVE] Reset gyro");
-    }));
+    //  System.out.println("[DRIVE] Reset gyro");
+     
+    // }));
 
   }
 
@@ -47,6 +49,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    mSwerve.periodic();
     SmartDashboard.putNumber("Front Right Encoder Value", mSwerve.mFrontRightModule.mEncoder.getRawValue()); 
     SmartDashboard.putNumber("Front Left Encoder Value", mSwerve.mFrontLeftModule.mEncoder.getRawValue());
     SmartDashboard.putNumber("Rear Right Encoder Value", mSwerve.mRearRightModule.mEncoder.getRawValue());
@@ -70,6 +73,7 @@ public class Robot extends TimedRobot {
 
   private void driveWithJoystick(boolean fieldRelative) {
     // Grab the X and Y axis from the left joystick on the controller
+    // var strafeX = MathUtil.applyDeadband(mController.getRawAxis(0), 0.1 );
     var strafeX = mController.getRawAxis(0);
     var forwardY = -mController.getRawAxis(1);
 

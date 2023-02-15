@@ -20,10 +20,12 @@ import frc.robot.prime.models.PidConstants;
 import frc.robot.sensors.navx.AHRS;
 
 public class SwerveDriveTrainSubsystem extends SubsystemBase {
+
   // Default PID values for steering each module and driving each module
   public static final PidConstants kDrivePidConstants = new PidConstants(0.01);
   public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
   private final Field2d mField = new Field2d();
+  private Rotation2d gyroAngle;
 
   // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
   double halfWheelBase = RobotMap.kRobotWheelBaseMeters / 2;
@@ -63,7 +65,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
     RobotMap.kRearRightEncoderOffset);
 
   // Build a gyro and a kinematics class for our drive
-  final AHRS mGyro = new AHRS(Port.kUSB);
+  final AHRS mGyro = new AHRS(Port.kUSB2);
   final SwerveDriveKinematics mKinematics = new SwerveDriveKinematics(
     frontLeftLocation, 
     frontRightLocation, 
@@ -94,7 +96,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    var gyroAngle = mGyro.getRotation2d();
+    gyroAngle = mGyro.getRotation2d();
     SmartDashboard.putNumber("Drivetrain gyro angle", gyroAngle.getDegrees());
 
     var robotPose = mOdometry.update(gyroAngle, new SwerveModulePosition[] {
@@ -107,13 +109,13 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
 
   public void resetGyro() {
     mGyro.reset();
+    System.out.println("[DRIVE] Reset gyro");
   }
 
   public void drive(double strafe, double forward, double rotation, boolean fieldRelative) {
     var desiredChassisSpeeds = fieldRelative
-      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, mGyro.getRotation2d())
+      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, gyroAngle)
       : new ChassisSpeeds(strafe, forward, rotation);
-
     var swerveModuleStates = mKinematics.toSwerveModuleStates(desiredChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, RobotMap.kDriveMaxSpeedMetersPerSecond);
 

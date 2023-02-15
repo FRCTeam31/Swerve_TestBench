@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.subsystems.SwerveDriveTrainSubsystem;
@@ -15,10 +16,11 @@ public class driveCommand extends CommandBase {
   private boolean fieldRelative;
   
 
-  public driveCommand(boolean fieldRelative) {
+  public driveCommand(boolean fieldRelative, SwerveDriveTrainSubsystem mSwerve) {
     // Use addRequirements() here to declare subsystem dependencies.
-    mSwerve = new SwerveDriveTrainSubsystem();
+    this.mSwerve = mSwerve;
     this.fieldRelative = fieldRelative;
+    addRequirements(mSwerve);
   }
 
   // Called when the command is initially scheduled.
@@ -28,7 +30,7 @@ public class driveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    var strafeX = mController.getRawAxis(0);
+    var strafeX = MathUtil.applyDeadband(mController.getRawAxis(0), 0.1);
     var forwardY = mController.getRawAxis(1);
     var rotation = mController.getRawAxis(2) + -mController.getRawAxis(3);
     mSwerve.drive(0, 0, 0, fieldRelative);

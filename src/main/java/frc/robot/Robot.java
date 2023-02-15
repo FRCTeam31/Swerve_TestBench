@@ -10,11 +10,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.SwerveDriveTrainSubsystem;
 
 public class Robot extends TimedRobot {
   private SwerveDriveTrainSubsystem mSwerve;
   private CommandJoystick mController;
+
+  
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -65,18 +68,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    driveWithJoystick(true);
   }
 
-  private void driveWithJoystick(boolean fieldRelative) {
-    // Grab the X and Y axis from the left joystick on the controller
-    var strafeX = mController.getRawAxis(0);
-    var forwardY = -mController.getRawAxis(1);
-
-    // Right trigger should rotate the robot clockwise, left counterclockwise
-    // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = mController.getRawAxis(2) + -mController.getRawAxis(3);
-
-    mSwerve.drive(strafeX, forwardY, rotation, true);
-  }
+ 
 }

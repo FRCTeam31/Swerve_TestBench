@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -15,12 +14,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.config.RobotMap;
 import frc.robot.prime.utilities.CTREConverter;
 import frc.robot.sensors.MA3Encoder;
+import prime.movers.LazyWPITalonFX;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
- private WPI_TalonFX mSteeringMotor;
- private WPI_TalonFX mDriveMotor;
+ private LazyWPITalonFX mSteeringMotor;
+ private LazyWPITalonFX mDriveMotor;
  public MA3Encoder mEncoder;
  private PIDController mSteeringPIDController;   
  private PIDController mDrivePIDController;
@@ -35,7 +34,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    super(new PIDController(RobotMap.kSteeringPidConstants.kP, RobotMap.kSteeringPidConstants.kI, RobotMap.kSteeringPidConstants.kD));
 
    // Set up the steering motor
-   mSteeringMotor = new WPI_TalonFX(steeringMotorId);
+   mSteeringMotor = new LazyWPITalonFX(steeringMotorId);
    mSteeringMotor.configFactoryDefault();
    mSteeringMotor.clearStickyFaults();
    mSteeringMotor.setNeutralMode(NeutralMode.Brake);
@@ -43,7 +42,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    mSteeringMotor.configOpenloopRamp(0.2);
 
    // Set up the drive motor
-   mDriveMotor = new WPI_TalonFX(driveMotorId);
+   mDriveMotor = new LazyWPITalonFX(driveMotorId);
    mDriveMotor.configFactoryDefault();
    mDriveMotor.clearStickyFaults();
    mDriveMotor.setNeutralMode(NeutralMode.Brake);

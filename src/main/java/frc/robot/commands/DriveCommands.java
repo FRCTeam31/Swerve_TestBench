@@ -20,6 +20,6 @@ public class DriveCommands {
             var rotation = mController.getRawAxis(2) + mController.getRawAxis(3);
 
             drivetrain.drive(strafeX, forwardY, rotation, false);
-        }, drivetrain);
+        }, drivetrain, modules[0], modules[1], modules[2], modules[3]);
     }
 }

@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
     // Grab the X and Y axis from the left joystick on the controller
     var strafeX = MathUtil.applyDeadband(mController.getRawAxis(0), 0.1 );
     // var strafeX = mController.getRawAxis(0);
-    var forwardY = -mController.getRawAxis(1);
+    var forwardY = -MathUtil.applyDeadband(mController.getRawAxis(1), 0.1);
 
     // Right trigger should rotate the robot clockwise, left counterclockwise
     // Add the two [0,1] trigger axes together for a combined period of [-1, 1]

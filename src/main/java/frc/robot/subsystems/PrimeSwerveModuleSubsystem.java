@@ -24,8 +24,6 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
  private WPI_TalonFX mSteeringMotor;
  private WPI_TalonFX mDriveMotor;
  public MA3Encoder mEncoder;
- private PIDController mDrivePIDController;
- private SimpleMotorFeedforward mDriveFeedforward;   
    
  public PrimeSwerveModuleSubsystem (
     int driveMotorId,
@@ -60,17 +58,14 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    // Create a PID controller to calculate steering motor output
    TalonFXConfiguration  driveMotorConfig = new TalonFXConfiguration();
    driveMotorConfig.slot0.kP = RobotMap.kDrivePidConstants.kP;
-   driveMotorConfig.slot0.kF = RobotMap.driveKf;
    mDriveMotor.configAllSettings(driveMotorConfig);
 
 
 
-   mDriveFeedforward = new SimpleMotorFeedforward(RobotMap.driveKs, RobotMap.driveKv, RobotMap.driveKa);
-   // mDrivePIDController = new PIDController(RobotMap.kDrivePidConstants.kP, 0, 0);
 
 
    getController().enableContinuousInput(-Math.PI, Math.PI);
-  //  mSteeringPIDController.setTolerance(0.1);
+   getController().setTolerance(0.1);
   enable();
  }
 
@@ -97,9 +92,9 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
       
    var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
    var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
-   var desiredVelocity20ms = (desiredState.speedMetersPerSecond / 50) * 2048; 
+   var desiredVelocity20ms = (desiredState.speedMetersPerSecond / 50) * RobotMap.falconTotalSensorUnits; 
    var desiredRotationsPer20ms = desiredVelocity20ms / RobotMap.kDriveWheelCircumference;
-   var desiredVelocity = (desiredRotationsPer20ms * 2048 * 5);
+   var desiredVelocity = (desiredRotationsPer20ms * RobotMap.falconTotalSensorUnits * 5);
 
    mDriveMotor.set(ControlMode.Velocity, desiredVelocity);  
    // Steering motor logic

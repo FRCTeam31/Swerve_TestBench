@@ -25,7 +25,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
   public static final PidConstants kDrivePidConstants = new PidConstants(0.1);
   public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
   private final Field2d mField = new Field2d();
-  private Rotation2d gyroAngle;
+  private Rotation2d mgyroAngle;
 
   // Initialize "locations" of each wheel in terms of x, y translation in meters from the origin (middle of the robot)
   double halfWheelBase = RobotMap.kRobotWheelBaseMeters / 2;
@@ -96,10 +96,10 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    gyroAngle = mGyro.getRotation2d();
-    SmartDashboard.putNumber("Drivetrain gyro angle", gyroAngle.getDegrees());
+    mgyroAngle = mGyro.getRotation2d();
+    SmartDashboard.putNumber("Drivetrain gyro angle", mgyroAngle.getDegrees());
 
-    var robotPose = mOdometry.update(gyroAngle, new SwerveModulePosition[] {
+    var robotPose = mOdometry.update(mgyroAngle, new SwerveModulePosition[] {
       mFrontLeftModule.getPosition(), mFrontRightModule.getPosition(),
       mRearLeftModule.getPosition(), mRearRightModule.getPosition()
     });
@@ -114,7 +114,7 @@ public class SwerveDriveTrainSubsystem extends SubsystemBase {
 
   public void drive(double strafe, double forward, double rotation, boolean fieldRelative) {
     var desiredChassisSpeeds = fieldRelative
-      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, gyroAngle)
+      ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, mgyroAngle)
       : new ChassisSpeeds(strafe, forward, rotation);
     var swerveModuleStates = mKinematics.toSwerveModuleStates(desiredChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, RobotMap.kDriveMaxSpeedMetersPerSecond);

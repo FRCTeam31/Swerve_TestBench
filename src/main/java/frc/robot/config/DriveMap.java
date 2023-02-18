@@ -2,7 +2,7 @@ package frc.robot.config;
 
 import frc.robot.prime.models.PidConstants;
 
-public class RobotMap {
+public class DriveMap {
   public static final double kRobotTrackWidthInches = 24.5;
   public static final double kRobotTrackWidthMeters = 0.6223;
   public static final double kRobotWheelBaseInches = 24;
@@ -53,6 +53,6 @@ public class RobotMap {
   public static byte driveMotorOutputTeeth = 13;
   public static byte driveMotorDriveGearTeeth = 42;
   public static final double kDriveMaxSpeedMetersPerSecond = 4.938; // 16.2ft per second in meters per second
-  public static final double kDriveMaxAngularSpeed = RobotMap.kRobotWheelBaseCircumference
+  public static final double kDriveMaxAngularSpeed = DriveMap.kRobotWheelBaseCircumference
       / kDriveMaxSpeedMetersPerSecond; // 180 degrees per second, half rotation
 }

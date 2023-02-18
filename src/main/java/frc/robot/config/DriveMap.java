@@ -52,6 +52,7 @@ public class DriveMap {
   // Gear ratios
   public static byte driveMotorOutputTeeth = 13;
   public static byte driveMotorDriveGearTeeth = 42;
+  public static int falconTotalSensorUnits = 2048;
   public static final double kDriveMaxSpeedMetersPerSecond = 4.938; // 16.2ft per second in meters per second
   public static final double kDriveMaxAngularSpeed = DriveMap.kRobotWheelBaseCircumference
       / kDriveMaxSpeedMetersPerSecond; // 180 degrees per second, half rotation

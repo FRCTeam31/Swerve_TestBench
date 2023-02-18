@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.MathUtil;
@@ -12,17 +13,17 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.Robot;
 import frc.robot.config.DriveMap;
 import frc.robot.prime.utilities.CTREConverter;
 import frc.robot.sensors.MA3Encoder;
+import prime.movers.LazyWPITalonFX;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 public class SwerveModule extends PIDSubsystem {
-   private WPI_TalonFX mSteeringMotor;
-   private WPI_TalonFX mDriveMotor;
+   private LazyWPITalonFX mSteeringMotor;
+   private LazyWPITalonFX mDriveMotor;
    public MA3Encoder mEncoder;
-   private PIDController mDrivePIDController;
-   private SimpleMotorFeedforward mDriveFeedforward;
 
    public SwerveModule(
          int driveMotorId,
@@ -33,7 +34,7 @@ public class SwerveModule extends PIDSubsystem {
             DriveMap.kSteeringPidConstants.kD));
 
       // Set up the steering motor
-      mSteeringMotor = new WPI_TalonFX(steeringMotorId);
+      mSteeringMotor = new LazyWPITalonFX(steeringMotorId);
       mSteeringMotor.configFactoryDefault();
       mSteeringMotor.clearStickyFaults();
       mSteeringMotor.setNeutralMode(NeutralMode.Brake);
@@ -41,7 +42,8 @@ public class SwerveModule extends PIDSubsystem {
       mSteeringMotor.configOpenloopRamp(0.2);
 
       // Set up the drive motor
-      mDriveMotor = new WPI_TalonFX(driveMotorId);
+      mDriveMotor = new LazyWPITalonFX(driveMotorId);
+
       mDriveMotor.configFactoryDefault();
       mDriveMotor.clearStickyFaults();
       mDriveMotor.setNeutralMode(NeutralMode.Brake);
@@ -54,12 +56,12 @@ public class SwerveModule extends PIDSubsystem {
       mEncoder = new MA3Encoder(encoderAioChannel, encoderBasePositionOffset, true);
 
       // Create a PID controller to calculate steering motor output
-
-      mDriveFeedforward = new SimpleMotorFeedforward(DriveMap.driveKs, DriveMap.driveKv, DriveMap.driveKa);
-      mDrivePIDController = new PIDController(DriveMap.kDrivePidConstants.kP, 0, 0);
+      TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
+      driveMotorConfig.slot0.kP = DriveMap.kDrivePidConstants.kP;
+      mDriveMotor.configAllSettings(driveMotorConfig);
 
       getController().enableContinuousInput(-Math.PI, Math.PI);
-      // mSteeringPIDController.setTolerance(0.1);
+      getController().setTolerance(0.1);
       enable();
    }
 
@@ -85,16 +87,11 @@ public class SwerveModule extends PIDSubsystem {
 
       // Drive motor logic
 
-      var currentVelocityInRotationsPer20ms = DriveMap.kDriveGearRatio
-            * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
-      var currentVelocityInMetersPer20ms = DriveMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
-      var desiredVelocity = (desiredState.speedMetersPerSecond / 50) * 2048;
-      var driveFeedForward = mDriveFeedforward.calculate(currentVelocityInMetersPer20ms, desiredVelocity, 0.2);
-      var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);
-      var desiredMotorVelocity = driveFeedback + driveFeedForward;
+      var desiredVelocity20ms = (desiredState.speedMetersPerSecond / 50) * DriveMap.falconTotalSensorUnits;
+      var desiredRotationsPer20ms = desiredVelocity20ms / DriveMap.kDriveWheelCircumference;
+      var desiredVelocity = (desiredRotationsPer20ms * DriveMap.falconTotalSensorUnits * 5);
 
-      mDriveMotor.set(ControlMode.PercentOutput, MathUtil.applyDeadband(desiredMotorVelocity, 0.15));
-
+      mDriveMotor.set(ControlMode.Velocity, desiredVelocity);
       // Steering motor logic
       var desiredPositionRadians = desiredState.angle.getRadians();
 

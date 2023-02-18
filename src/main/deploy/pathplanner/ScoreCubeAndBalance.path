@@ -63,7 +63,7 @@
       "nextControl": null,
       "holonomicAngle": -180.0,
       "isReversal": false,
-      "velOverride": 1.0,
+      "velOverride": 1.5,
       "isLocked": true,
       "isStopPoint": false,
       "stopEvent": {

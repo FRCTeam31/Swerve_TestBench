@@ -59,10 +59,12 @@ public class RobotContainer {
                                 RearRightSwerveModule);
                 Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
                 Drivetrain.register();
+
+                configureButtonBindings();
         }
 
         private void configureButtonBindings() {
-
+                mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
         }
 
 }

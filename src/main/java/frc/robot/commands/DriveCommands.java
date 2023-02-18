@@ -22,4 +22,9 @@ public class DriveCommands {
             drivetrain.drive(strafeX, forwardY, rotation, false);
         }, drivetrain, modules[0], modules[1], modules[2], modules[3]);
     }
+
+    public static Command resetGyroComamand(Drivetrain driveTrain) {
+        return Commands.runOnce(() -> driveTrain.resetGyro(), driveTrain);
+
+    }
 }

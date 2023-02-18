@@ -48,17 +48,21 @@ public class RobotContainer {
 
         public RobotContainer() {
 
+                SwerveModule[] modules = new SwerveModule[4];
+                modules[0] = FrontLeftSwerveModule;
+                modules[1] = FrontRightSwerveModule;
+                modules[2] = RearLeftSwerveModule;
+                modules[3] = RearRightSwerveModule;
+
                 mController = new CommandJoystick(0);
                 Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
                                 RearRightSwerveModule);
-                Drivetrain.setDefaultCommand(Commands.run(() -> {
-                        var strafeX = MathUtil.applyDeadband(mController.getRawAxis(0), 0.1);
-                        var forwardY = mController.getRawAxis(1);
-                        var rotation = mController.getRawAxis(2) + mController.getRawAxis(3);
-
-                        Drivetrain.drive(strafeX, forwardY, rotation, false);
-                }, Drivetrain));
+                Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
                 Drivetrain.register();
+        }
+
+        private void configureButtonBindings() {
+
         }
 
 }

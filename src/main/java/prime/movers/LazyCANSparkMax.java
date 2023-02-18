@@ -12,10 +12,11 @@ public class LazyCANSparkMax extends CANSparkMax {
     public double getLastSpeed() {
         return mLastSpeed;
     }
-    
+
     @Override
     public void set(double speed) {
-        if (speed == mLastSpeed) return;
+        if (speed == mLastSpeed)
+            return;
 
         mLastSpeed = speed;
         set(speed);

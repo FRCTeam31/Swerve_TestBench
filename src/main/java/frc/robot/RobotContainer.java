@@ -8,13 +8,16 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.config.DriveMap;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveModule;
 
 /** Add your docs here. */
 public class RobotContainer {
         private Drivetrain Drivetrain;
+        private IntakeSubsystem intakeSubsystem;
 
         // Front Left
         public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -60,11 +63,32 @@ public class RobotContainer {
                 Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
                 Drivetrain.register();
 
+                intakeSubsystem = new IntakeSubsystem();
+                intakeSubsystem.register();
+
                 configureButtonBindings();
         }
 
         private void configureButtonBindings() {
+                // Reset gyro Button
                 mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+                // Run Intake buttons
+                mController.pov(180)
+                                .onTrue(Commands.run(() -> {
+
+                                        intakeSubsystem.runIntake(0.5 * -1);
+
+                                }, intakeSubsystem))
+                                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+                mController.pov(0)
+                                .onTrue(Commands.run(() -> {
+
+                                        intakeSubsystem.runIntake(0.5 * 1);
+
+                                }, intakeSubsystem))
+                                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+                // Move intake button
+
         }
 
 }

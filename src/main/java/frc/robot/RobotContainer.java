@@ -13,6 +13,7 @@ import frc.robot.subsystems.*;
 /** Add your docs here. */
 public class RobotContainer {
     public Drivetrain Drivetrain;
+    private IntakeSubsystem intakeSubsystem;
     private TurretRotation turretRotation;
 
     // Front Left
@@ -58,15 +59,35 @@ public class RobotContainer {
         mController = new CommandJoystick(0);
         Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
                 RearRightSwerveModule);
-        Drivetrain.setDefaultCommand(DriveCommands.defaultDriveCommand(mController, Drivetrain, modules));
+        Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
         Drivetrain.register();
+
+        intakeSubsystem = new IntakeSubsystem();
+        intakeSubsystem.register();
 
         configureButtonBindings();
     }
 
     private void configureButtonBindings() {
+        // Reset gyro Button
         // Reset Gyro
         mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+        // Run Intake buttons
+        mController.pov(180)
+                .onTrue(Commands.run(() -> {
+
+                    intakeSubsystem.runIntake(0.5 * -1);
+
+                }, intakeSubsystem))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+        mController.pov(0)
+                .onTrue(Commands.run(() -> {
+
+                    intakeSubsystem.runIntake(0.5 * 1);
+
+                }, intakeSubsystem))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+        // Move intake button
 
         // Move turret left
         mController.pov(90)

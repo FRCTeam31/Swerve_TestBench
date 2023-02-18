@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.config.DriveMap;
+import frc.robot.config.RobotMap;
 import frc.robot.prime.models.PidConstants;
 import frc.robot.sensors.navx.AHRS;
 
@@ -27,8 +27,8 @@ public class Drivetrain extends SubsystemBase {
 
   // Initialize "locations" of each wheel in terms of x, y translation in meters
   // from the origin (middle of the robot)
-  double halfWheelBase = DriveMap.kRobotWheelBaseMeters / 2;
-  double halfTrackWidth = DriveMap.kRobotTrackWidthMeters / 2;
+  double halfWheelBase = RobotMap.kRobotWheelBaseMeters / 2;
+  double halfTrackWidth = RobotMap.kRobotTrackWidthMeters / 2;
   final Translation2d frontLeftLocation = new Translation2d(-halfTrackWidth, halfWheelBase);
   final Translation2d frontRightLocation = new Translation2d(halfTrackWidth, halfWheelBase);
   final Translation2d rearLeftLocation = new Translation2d(-halfTrackWidth, -halfWheelBase);
@@ -36,10 +36,33 @@ public class Drivetrain extends SubsystemBase {
 
   // Build serve drive modules with encoder channel & offset, and CAN IDs for
   // drive and steering motors
-  public SwerveModule mFrontLeftModule;
-  public SwerveModule mFrontRightModule;
-  public SwerveModule mRearLeftModule;
-  public SwerveModule mRearRightModule;
+  // Front Left
+  public final SwerveModule mFrontLeftModule = new SwerveModule(
+      RobotMap.kFrontLeftDrivingMotorId,
+      RobotMap.kFrontLeftSteeringMotorId,
+      RobotMap.kFrontLeftEncoderAIOChannel,
+      RobotMap.kFrontLeftEncoderOffset);
+
+  // Front Right
+  public final SwerveModule mFrontRightModule = new SwerveModule(
+      RobotMap.kFrontRightDrivingMotorId,
+      RobotMap.kFrontRightSteeringMotorId,
+      RobotMap.kFrontRightEncoderAIOChannel,
+      RobotMap.kFrontRightEncoderOffset);
+
+  // Rear Left
+  public final SwerveModule mRearLeftModule = new SwerveModule(
+      RobotMap.kRearLeftDrivingMotorId,
+      RobotMap.kRearLeftSteeringMotorId,
+      RobotMap.kRearLeftEncoderAIOChannel,
+      RobotMap.kRearLeftEncoderOffset);
+
+  // Rear Right
+  public final SwerveModule mRearRightModule = new SwerveModule(
+      RobotMap.kRearRightDrivingMotorId,
+      RobotMap.kRearRightSteeringMotorId,
+      RobotMap.kRearRightEncoderAIOChannel,
+      RobotMap.kRearRightEncoderOffset);
 
   // Build a gyro and a kinematics class for our drive
   final AHRS mGyro = new AHRS(Port.kUSB);
@@ -49,23 +72,21 @@ public class Drivetrain extends SubsystemBase {
       rearLeftLocation,
       rearRightLocation);
 
-  SwerveDriveOdometry mOdometry;
+  SwerveDriveOdometry mOdometry = new SwerveDriveOdometry(mKinematics,
+      mGyro.getRotation2d(),
+      new SwerveModulePosition[] {
+          mFrontLeftModule.getPosition(),
+          mFrontRightModule.getPosition(),
+          mRearLeftModule.getPosition(),
+          mRearRightModule.getPosition(),
+      },
+      new Pose2d(0, 0, Rotation2d.fromDegrees(90)));
 
   /** Creates a new SwerveDriveTrainSubsystem. */
-  public Drivetrain(SwerveModule frontLeftModule, SwerveModule frontRightModule, SwerveModule rearLeftModule,
-      SwerveModule rearRightModule) {
+  public Drivetrain() {
     SmartDashboard.putData("Field", mField);
-    mFrontLeftModule = frontLeftModule;
 
-    new SwerveDriveOdometry(mKinematics,
-        mGyro.getRotation2d(),
-        new SwerveModulePosition[] {
-            mFrontLeftModule.getPosition(),
-            mFrontRightModule.getPosition(),
-            mRearLeftModule.getPosition(),
-            mRearRightModule.getPosition(),
-        },
-        new Pose2d(0, 0, Rotation2d.fromDegrees(90)));
+    // setDefaultCommand(new DriveCommand(false, null, null));
   }
 
   @Override
@@ -92,7 +113,7 @@ public class Drivetrain extends SubsystemBase {
         : new ChassisSpeeds(strafe, forward, rotation);
 
     var swerveModuleStates = mKinematics.toSwerveModuleStates(desiredChassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveMap.kDriveMaxSpeedMetersPerSecond);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, RobotMap.kDriveMaxSpeedMetersPerSecond);
 
     mFrontLeftModule.setDesiredState(swerveModuleStates[0]);
     mFrontRightModule.setDesiredState(swerveModuleStates[1]);

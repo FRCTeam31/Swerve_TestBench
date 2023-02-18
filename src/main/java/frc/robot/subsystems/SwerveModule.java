@@ -12,7 +12,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.config.DriveMap;
+import frc.robot.config.RobotMap;
 import frc.robot.prime.utilities.CTREConverter;
 import frc.robot.sensors.MA3Encoder;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
@@ -29,8 +29,8 @@ public class SwerveModule extends PIDSubsystem {
          int steeringMotorId,
          int encoderAioChannel,
          int encoderBasePositionOffset) {
-      super(new PIDController(DriveMap.kSteeringPidConstants.kP, DriveMap.kSteeringPidConstants.kI,
-            DriveMap.kSteeringPidConstants.kD));
+      super(new PIDController(RobotMap.kSteeringPidConstants.kP, RobotMap.kSteeringPidConstants.kI,
+            RobotMap.kSteeringPidConstants.kD));
 
       // Set up the steering motor
       mSteeringMotor = new WPI_TalonFX(steeringMotorId);
@@ -55,8 +55,8 @@ public class SwerveModule extends PIDSubsystem {
 
       // Create a PID controller to calculate steering motor output
 
-      mDriveFeedforward = new SimpleMotorFeedforward(DriveMap.driveKs, DriveMap.driveKv, DriveMap.driveKa);
-      mDrivePIDController = new PIDController(DriveMap.kDrivePidConstants.kP, 0, 0);
+      mDriveFeedforward = new SimpleMotorFeedforward(RobotMap.driveKs, RobotMap.driveKv, RobotMap.driveKa);
+      mDrivePIDController = new PIDController(RobotMap.kDrivePidConstants.kP, 0, 0);
 
       getController().enableContinuousInput(-Math.PI, Math.PI);
       // mSteeringPIDController.setTolerance(0.1);
@@ -67,8 +67,8 @@ public class SwerveModule extends PIDSubsystem {
       return new SwerveModulePosition(
             CTREConverter.falconToMeters(
                   mDriveMotor.getSelectedSensorPosition(),
-                  DriveMap.kDriveWheelCircumference,
-                  DriveMap.kDriveGearRatio),
+                  RobotMap.kDriveWheelCircumference,
+                  RobotMap.kDriveGearRatio),
             mEncoder.getRotation2d());
    }
 
@@ -85,9 +85,9 @@ public class SwerveModule extends PIDSubsystem {
 
       // Drive motor logic
 
-      var currentVelocityInRotationsPer20ms = DriveMap.kDriveGearRatio
+      var currentVelocityInRotationsPer20ms = RobotMap.kDriveGearRatio
             * ((mDriveMotor.getSelectedSensorVelocity(0) / 5) / mEncoder.kPositionsPerRotation);
-      var currentVelocityInMetersPer20ms = DriveMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
+      var currentVelocityInMetersPer20ms = RobotMap.kDriveWheelCircumference * currentVelocityInRotationsPer20ms;
       var desiredVelocity = (desiredState.speedMetersPerSecond / 50) * 2048;
       var driveFeedForward = mDriveFeedforward.calculate(currentVelocityInMetersPer20ms, desiredVelocity, 0.2);
       var driveFeedback = mDrivePIDController.calculate(currentVelocityInMetersPer20ms, desiredVelocity);

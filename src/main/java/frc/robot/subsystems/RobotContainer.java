@@ -49,7 +49,8 @@ public class RobotContainer {
         public RobotContainer() {
 
                 mController = new CommandJoystick(0);
-                Drivetrain = new Drivetrain();
+                Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
+                                RearRightSwerveModule);
                 Drivetrain.setDefaultCommand(Commands.run(() -> {
                         var strafeX = MathUtil.applyDeadband(mController.getRawAxis(0), 0.1);
                         var forwardY = mController.getRawAxis(1);

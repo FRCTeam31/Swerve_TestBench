@@ -45,6 +45,14 @@ public class Drivetrain extends SubsystemBase {
       rearLeftLocation,
       rearRightLocation);
 
+  // Swerve Modules
+  SwerveModule FrontLeftSwerveModule;
+  SwerveModule FrontRightSwerveModule;
+  SwerveModule RearLeftSwerveModule;
+  SwerveModule RearRightSwerveModule;
+
+  SwerveDriveOdometry mOdometry;
+
   /** Creates a new SwerveDriveTrainSubsystem. */
   public Drivetrain(SwerveModule FrontLeftSwerveModule, SwerveModule FrontRightSwerveModule,
       SwerveModule RearLeftSwerveModule, SwerveModule RearRightSwerveModule) {
@@ -58,6 +66,11 @@ public class Drivetrain extends SubsystemBase {
             RearRightSwerveModule.getPosition(),
         },
         new Pose2d(0, 0, Rotation2d.fromDegrees(90)));
+    this.mOdometry = mOdometry;
+    this.FrontLeftSwerveModule = FrontLeftSwerveModule;
+    this.FrontRightSwerveModule = FrontRightSwerveModule;
+    this.RearLeftSwerveModule = RearLeftSwerveModule;
+    this.RearRightSwerveModule = RearRightSwerveModule;
 
     // setDefaultCommand(new DriveCommand(false, null, null));
   }
@@ -69,8 +82,8 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Drivetrain gyro angle", gyroAngle.getDegrees());
 
     var robotPose = mOdometry.update(gyroAngle, new SwerveModulePosition[] {
-        FrontLeftSwerveModule.getPosition(), mFrontRightModule.getPosition(),
-        mRearLeftModule.getPosition(), mRearRightModule.getPosition()
+        FrontLeftSwerveModule.getPosition(), FrontRightSwerveModule.getPosition(),
+        RearLeftSwerveModule.getPosition(), RearRightSwerveModule.getPosition()
     });
 
     mField.setRobotPose(robotPose);
@@ -88,9 +101,9 @@ public class Drivetrain extends SubsystemBase {
     var swerveModuleStates = mKinematics.toSwerveModuleStates(desiredChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveMap.kDriveMaxSpeedMetersPerSecond);
 
-    mFrontLeftModule.setDesiredState(swerveModuleStates[0]);
-    mFrontRightModule.setDesiredState(swerveModuleStates[1]);
-    mRearLeftModule.setDesiredState(swerveModuleStates[2]);
-    mRearRightModule.setDesiredState(swerveModuleStates[3]);
+    FrontLeftSwerveModule.setDesiredState(swerveModuleStates[0]);
+    FrontRightSwerveModule.setDesiredState(swerveModuleStates[1]);
+    RearLeftSwerveModule.setDesiredState(swerveModuleStates[2]);
+    RearRightSwerveModule.setDesiredState(swerveModuleStates[3]);
   }
 }

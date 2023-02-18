@@ -16,8 +16,8 @@ public class DriveCommands {
             SwerveModule[] modules) {
         return Commands.run(() -> {
             var strafeX = MathUtil.applyDeadband(mController.getRawAxis(0), 0.1);
-            var forwardY = mController.getRawAxis(1);
-            var rotation = mController.getRawAxis(2) + mController.getRawAxis(3);
+            var forwardY = -mController.getRawAxis(1);
+            var rotation = mController.getRawAxis(2) - mController.getRawAxis(3);
 
             drivetrain.drive(strafeX, forwardY, rotation, false);
         }, drivetrain, modules[0], modules[1], modules[2], modules[3]);

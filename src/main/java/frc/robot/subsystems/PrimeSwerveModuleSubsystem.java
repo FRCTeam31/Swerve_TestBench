@@ -42,7 +42,7 @@ public class PrimeSwerveModuleSubsystem extends PIDSubsystem {
    mSteeringMotor.configOpenloopRamp(0.2);
 
    // Set up the drive motor
-   mDriveMotor = new WPI_TalonFX(driveMotorId);
+   mDriveMotor = new LazyWPITalonFX(driveMotorId);
    
    
    mDriveMotor.configFactoryDefault();

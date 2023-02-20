@@ -1,0 +1,26 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "gradle",
+			"id": "/workspaces/Swerve_TestBenchbuildSwerve_TestBench",
+			"script": "build",
+			"description": "Assembles and tests this project.",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"project": "Swerve_TestBench",
+			"buildFile": "/workspaces/Swerve_TestBench/build.gradle",
+			"rootProject": "Swerve_TestBench",
+			"projectFolder": "/workspaces/Swerve_TestBench",
+			"workspaceFolder": "/workspaces/Swerve_TestBench",
+			"args": "",
+			"javaDebug": false,
+			"problemMatcher": [
+				"$gradle"
+			],
+			"label": "gradle: build"
+		}
+	]
+}

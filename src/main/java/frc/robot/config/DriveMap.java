@@ -1,29 +1,27 @@
 package frc.robot.config;
 
-import frc.robot.prime.models.PidConstants;
+import prime.models.PidConstants;
 
 public class DriveMap {
-  public static final double kRobotTrackWidthInches = 24.5;
+  // Physical measurements
   public static final double kRobotTrackWidthMeters = 0.6223;
-  public static final double kRobotWheelBaseInches = 24;
   public static final double kRobotWheelBaseMeters = 0.6096;
-  public static final double kRobotWheelBaseCircumference = 2.73702;
+  public static final double kRobotWheelBaseCircumferenceMeters = 2.73702;
 
-  public static final double kDriveWheelDiamter = 0.102;
+  public static final double kDriveWheelDiameterMeters = 0.102;
   public static final byte kDriveMotorOutputTeeth = 13;
   public static final byte kDriveMotorDrivenGearTeeth = 42;
+
+  // Calculated values
   public static final double kDriveGearRatio = kDriveMotorDrivenGearTeeth / kDriveMotorOutputTeeth;
-  public static final double kDriveWheelCircumference = Math.PI * kDriveWheelDiamter;
+  public static final double kDriveWheelCircumference = Math.PI * kDriveWheelDiameterMeters;
+  
+  // Measured SysId values
   public static final double driveKs = -0.13939;
   public static final double driveKv = 0.029115;
   public static final double driveKa = 0.0050108;
-  public static final double driveKp = 0.0016983;
-  public static final PidConstants kDrivePidConstants = new PidConstants(driveKp);
-
-  public static final double steeringKp = 0.4;
-  public static final double steeringKi = 0;
-  public static final double steeringKd = 0;
-  public static final PidConstants kSteeringPidConstants = new PidConstants(steeringKp, steeringKi, steeringKd);
+  public static final PidConstants kDrivePidConstants = new PidConstants(0.0016983);
+  public static final PidConstants kSteeringPidConstants = new PidConstants(0.4);
 
   // FR
   public static int kFrontRightSteeringMotorId = 11;
@@ -54,6 +52,6 @@ public class DriveMap {
   public static byte driveMotorDriveGearTeeth = 42;
   public static int falconTotalSensorUnits = 2048;
   public static final double kDriveMaxSpeedMetersPerSecond = 4.938; // 16.2ft per second in meters per second
-  public static final double kDriveMaxAngularSpeed = DriveMap.kRobotWheelBaseCircumference
-      / kDriveMaxSpeedMetersPerSecond; // 180 degrees per second, half rotation
+  public static final double kDriveMaxAngularSpeed = DriveMap.kRobotWheelBaseCircumferenceMeters
+      / kDriveMaxSpeedMetersPerSecond;
 }

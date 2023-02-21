@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   private CommandJoystick m_controller;
   private boolean mDriveShifter = false;
 
-  private final double kJoystickDeadband = 0.15;
+  
 
   // private RobotContainer m_robotContainer;
 
@@ -45,8 +45,10 @@ public class Robot extends TimedRobot {
      System.out.println("[DRIVE] Reset gyro");
     }));
 
-    m_controller.button(2).onTrue(Commands.runOnce(() -> {
+    m_controller.button(4).onTrue(Commands.runOnce(() -> {
       mDriveShifter = !mDriveShifter;
+      System.out.println("[DRIVE] shifter");
+      //SmartDashboard.putBoolean(null, mDriveShifter);
     }));
   }
   

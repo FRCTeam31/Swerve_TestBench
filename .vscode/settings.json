@@ -30,5 +30,7 @@
   "java.test.defaultConfig": "WPIlibUnitTests",
   "wpilib.autoStartRioLog": false,
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "redhat.java"
+  "editor.defaultFormatter": "redhat.java",
+  "editor.tabSize": 4,
+  "editor.detectIndentation": false
 }

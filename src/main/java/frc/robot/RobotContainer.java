@@ -14,57 +14,59 @@ import frc.robot.subsystems.SwerveModule;
 
 /** Add your docs here. */
 public class RobotContainer {
-        private Drivetrain Drivetrain;
+    private Drivetrain mDrivetrain;
+    private DriveCommands mDriveCommands;
 
-        // Front Left
-        public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
-                        DriveMap.kFrontLeftDrivingMotorId,
-                        DriveMap.kFrontLeftSteeringMotorId,
-                        DriveMap.kFrontLeftEncoderAIOChannel,
-                        DriveMap.kFrontLeftEncoderOffset);
+    // Front Left
+    public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
+            DriveMap.kFrontLeftDrivingMotorId,
+            DriveMap.kFrontLeftSteeringMotorId,
+            DriveMap.kFrontLeftEncoderAIOChannel,
+            DriveMap.kFrontLeftEncoderOffset);
 
-        // Front Right
-        public final SwerveModule FrontRightSwerveModule = new SwerveModule(
-                        DriveMap.kFrontRightDrivingMotorId,
-                        DriveMap.kFrontRightSteeringMotorId,
-                        DriveMap.kFrontRightEncoderAIOChannel,
-                        DriveMap.kFrontRightEncoderOffset);
+    // Front Right
+    public final SwerveModule FrontRightSwerveModule = new SwerveModule(
+            DriveMap.kFrontRightDrivingMotorId,
+            DriveMap.kFrontRightSteeringMotorId,
+            DriveMap.kFrontRightEncoderAIOChannel,
+            DriveMap.kFrontRightEncoderOffset);
 
-        // Rear Left
-        public final SwerveModule RearLeftSwerveModule = new SwerveModule(
-                        DriveMap.kRearLeftDrivingMotorId,
-                        DriveMap.kRearLeftSteeringMotorId,
-                        DriveMap.kRearLeftEncoderAIOChannel,
-                        DriveMap.kRearLeftEncoderOffset);
+    // Rear Left
+    public final SwerveModule RearLeftSwerveModule = new SwerveModule(
+            DriveMap.kRearLeftDrivingMotorId,
+            DriveMap.kRearLeftSteeringMotorId,
+            DriveMap.kRearLeftEncoderAIOChannel,
+            DriveMap.kRearLeftEncoderOffset);
 
-        // Rear Right
-        public final SwerveModule RearRightSwerveModule = new SwerveModule(
-                        DriveMap.kRearRightDrivingMotorId,
-                        DriveMap.kRearRightSteeringMotorId,
-                        DriveMap.kRearRightEncoderAIOChannel,
-                        DriveMap.kRearRightEncoderOffset);
+    // Rear Right
+    public final SwerveModule RearRightSwerveModule = new SwerveModule(
+            DriveMap.kRearRightDrivingMotorId,
+            DriveMap.kRearRightSteeringMotorId,
+            DriveMap.kRearRightEncoderAIOChannel,
+            DriveMap.kRearRightEncoderOffset);
 
-        private CommandJoystick mController;
+    private CommandJoystick mController;
 
-        public RobotContainer() {
+    public RobotContainer() {
 
-                SwerveModule[] modules = new SwerveModule[4];
-                modules[0] = FrontLeftSwerveModule;
-                modules[1] = FrontRightSwerveModule;
-                modules[2] = RearLeftSwerveModule;
-                modules[3] = RearRightSwerveModule;
+        SwerveModule[] modules = new SwerveModule[4];
+        modules[0] = FrontLeftSwerveModule;
+        modules[1] = FrontRightSwerveModule;
+        modules[2] = RearLeftSwerveModule;
+        modules[3] = RearRightSwerveModule;
 
-                mController = new CommandJoystick(0);
-                Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
-                                RearRightSwerveModule);
-                Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
-                Drivetrain.register();
+        mController = new CommandJoystick(0);
+        mDrivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
+                RearRightSwerveModule);
+        mDriveCommands = new DriveCommands(mDrivetrain, modules);
+        mDrivetrain.setDefaultCommand(mDriveCommands.DefaultDriveCommand(mController));
+        mDrivetrain.register();
 
-                configureButtonBindings();
-        }
+        configureButtonBindings();
+    }
 
-        private void configureButtonBindings() {
-                mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
-        }
+    private void configureButtonBindings() {
+        mController.button(3).onTrue(mDriveCommands.resetGyroComamand());
+    }
 
 }

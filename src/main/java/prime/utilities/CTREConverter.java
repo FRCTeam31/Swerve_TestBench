@@ -1,4 +1,4 @@
-package frc.robot.prime.utilities;
+package prime.utilities;
 
 /**
  * Credit to @Respawn-Robotics for the functions in this class. 

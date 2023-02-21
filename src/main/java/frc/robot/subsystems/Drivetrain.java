@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.DriveMap;
-import frc.robot.prime.models.PidConstants;
+import prime.models.PidConstants;
 import frc.robot.sensors.navx.AHRS;
 
 public class Drivetrain extends SubsystemBase {

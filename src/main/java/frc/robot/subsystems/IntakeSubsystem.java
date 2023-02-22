@@ -35,6 +35,9 @@ public class IntakeSubsystem extends SubsystemBase {
     compressor = new Compressor(PneumaticsModuleType.CTREPCM);
     compressor.enableDigital();
 
+    leftSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
+    rightSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 3);
+
     // Set up pneumatics
   }
 

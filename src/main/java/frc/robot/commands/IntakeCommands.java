@@ -26,7 +26,8 @@ public class IntakeCommands extends CommandBase {
   }
 
   public static Command moveIntake(IntakeSubsystem intakeSubsystem, boolean direction) {
-    return Commands.run(() -> {
+
+    return Commands.runOnce(() -> {
       intakeSubsystem.moveIntake(direction);
     }, intakeSubsystem);
 

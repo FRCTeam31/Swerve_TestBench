@@ -5,6 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.DriveCommands;
@@ -18,6 +21,10 @@ import frc.robot.subsystems.SwerveModule;
 public class RobotContainer {
         private Drivetrain Drivetrain;
         private IntakeSubsystem intakeSubsystem;
+        private Compressor compressor;
+
+        public Solenoid leftSolenoid;
+        public Solenoid rightSolenoid;
 
         // Front Left
         public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -51,6 +58,10 @@ public class RobotContainer {
 
         public RobotContainer() {
 
+                compressor = new Compressor(PneumaticsModuleType.CTREPCM);
+                leftSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+                rightSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
+
                 SwerveModule[] modules = new SwerveModule[4];
                 modules[0] = FrontLeftSwerveModule;
                 modules[1] = FrontRightSwerveModule;
@@ -63,8 +74,8 @@ public class RobotContainer {
                 Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
                 Drivetrain.register();
 
-                intakeSubsystem = new IntakeSubsystem();
-                intakeSubsystem.register();
+                // intakeSubsystem = new IntakeSubsystem();
+                // intakeSubsystem.register();
 
                 configureButtonBindings();
         }
@@ -89,6 +100,15 @@ public class RobotContainer {
                                 .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
                 // Move intake button
 
-        }
+                mController.button(4).onTrue(Commands.runOnce(() -> {
+                        leftSolenoid.set(true);
+                        rightSolenoid.set(true);
+                }));
 
+                mController.button(5).onTrue(Commands.runOnce(() -> {
+                        leftSolenoid.set(false);
+                        rightSolenoid.set(false);
+                }));
+
+        }
 }

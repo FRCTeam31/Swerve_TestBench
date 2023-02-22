@@ -11,13 +11,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.DriveMap;
 import frc.robot.prime.models.PidConstants;
-import frc.robot.sensors.navx.AHRS;
 
 public class Drivetrain extends SubsystemBase {
   // Default PID values for steering each module and driving each module
@@ -38,7 +39,7 @@ public class Drivetrain extends SubsystemBase {
   // drive and steering motors
 
   // Build a gyro and a kinematics class for our drive
-  final AHRS mGyro = new AHRS(Port.kUSB);
+  final ADXRS450_Gyro mGyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
   final SwerveDriveKinematics mKinematics = new SwerveDriveKinematics(
       frontLeftLocation,
       frontRightLocation,

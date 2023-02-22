@@ -4,17 +4,16 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.DriveCommands;
 import frc.robot.config.DriveMap;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.*;
 
 /** Add your docs here. */
 public class RobotContainer {
         private Drivetrain Drivetrain;
+        private Flywheel Flywheel;
 
         // Front Left
         public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -60,11 +59,17 @@ public class RobotContainer {
                 Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
                 Drivetrain.register();
 
+                Flywheel = new Flywheel();
+
                 configureButtonBindings();
         }
 
         private void configureButtonBindings() {
                 mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
-        }
 
+                // Run flywheel at max while the button is held
+                mController.button(6)
+                                .onTrue(Commands.runOnce(() -> Flywheel.setSpeed(Flywheel.kMaxRpm), Flywheel))
+                                .onFalse(Commands.runOnce(() -> Flywheel.setSpeed(0), Flywheel));
+        }
 }

@@ -57,5 +57,5 @@ public class DriveMap {
     public static final double kDriveMaxAngularSpeed = DriveMap.kRobotWheelBaseCircumference
             / kDriveMaxSpeedMetersPerSecond; // 180 degrees per second, half rotation
 
-    public static final double kDriveLowGearCoefficient = 0.6;
+    public static final double kDriveLowGearCoefficient = 0.1;
 }

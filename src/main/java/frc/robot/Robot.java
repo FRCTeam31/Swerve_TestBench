@@ -4,111 +4,40 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.config.RobotMap;
-import frc.robot.subsystems.SwerveDriveTrainSubsystem;
 
 public class Robot extends TimedRobot {
-  private SwerveDriveTrainSubsystem m_swerve;
-  private CommandJoystick m_controller;
-  private boolean mDriveShifter = false;
+    private RobotContainer mRobotContainer;
 
-  
-
-  // private RobotContainer m_robotContainer;
-
-
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {
-    m_controller = new CommandJoystick(0);
-    m_swerve = new SwerveDriveTrainSubsystem();
-
-    m_controller.button(3).onTrue(Commands.runOnce(() -> {
-     m_swerve.resetGyro();
-     
-     System.out.println("[DRIVE] Reset gyro");
-    }));
-
-    m_controller.button(4).onTrue(Commands.runOnce(() -> {
-      mDriveShifter = !mDriveShifter;
-      System.out.println("[DRIVE] shifter");
-      //SmartDashboard.putBoolean(null, mDriveShifter);
-    }));
-  }
-  
-
-
-
-  /**
-   * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
-    SmartDashboard.putNumber("Front Right Encoder Value", m_swerve.m_frontRightModule.mEncoder.getRawValue());
-    SmartDashboard.putNumber("Front Left Encoder Value", m_swerve.m_frontLeftModule.mEncoder.getRawValue());
-    SmartDashboard.putNumber("Rear Right Encoder Value", m_swerve.m_rearRightModule.mEncoder.getRawValue());
-    SmartDashboard.putNumber("Rear Left Encoder Value",  m_swerve.m_rearLeftModule.mEncoder.getRawValue());
-  }
-
-  @Override
-  public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    // if (m_autonomousCommand != null) {
-    //   m_autonomousCommand.cancel();
-    // }
-
-    m_swerve.resetGyro();
-  }
-
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {
-    driveWithJoystick(true);
-  }
-
-  private void driveWithJoystick(boolean fieldRelative) {
-    // Grab the X and Y axis from the left joystick on the controller
-    var strafeX = m_controller.getRawAxis(0);
-    var forwardY = -m_controller.getRawAxis(1);
-
-    // Right trigger should rotate the robot clockwise, left counterclockwise
-    // Add the two [0,1] trigger axes together for a combined period of [-1, 1]
-    var rotation = m_controller.getRawAxis(3) + -m_controller.getRawAxis(2);
-
-    if (!mDriveShifter) {
-      strafeX *= RobotMap.kDriveLowGearCoefficient;
-      forwardY *= RobotMap.kDriveLowGearCoefficient;
-      rotation *= RobotMap.kDriveLowGearCoefficient;
+    /**
+     * This function is run when the robot is first started up and should be used
+     * for any
+     * initialization code.
+     */
+    @Override
+    public void robotInit() {
+        mRobotContainer = new RobotContainer();
     }
 
-    m_swerve.drive(strafeX, forwardY, rotation, true);
-  }
+    /**
+     * This function is called every 20 ms, no matter the mode. Use this for items
+     * like diagnostics
+     * that you want ran during disabled, autonomous, teleoperated and test.
+     *
+     * <p>
+     * This runs after the mode specific periodic functions, but before LiveWindow
+     * and
+     * SmartDashboard integrated updating.
+     */
+    @Override
+    public void robotPeriodic() {
+        CommandScheduler.getInstance().run();
+    }
+
+    @Override
+    public void teleopInit() {
+        // TODO: Reset gyro
+
+    }
 }

@@ -25,6 +25,7 @@ public class RobotContainer {
     public Solenoid leftSolenoid;
     public Solenoid rightSolenoid;
     private TurretRotation turretRotation;
+    private Flywheel Flywheel;
 
     // Front Left
     public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -71,13 +72,14 @@ public class RobotContainer {
 
         turretRotation = new TurretRotation();
 
-        mController = new CommandJoystick(0);
-        Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
-                RearRightSwerveModule);
-        Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
-        Drivetrain.register();
+                mController = new CommandJoystick(0);
+                Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
+                                RearRightSwerveModule);
+                Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
+                Drivetrain.register();
 
-        intakeSubsystem = new IntakeSubsystem();
+                Flywheel = new Flywheel();
+                intakeSubsystem = new IntakeSubsystem();
         intakeSubsystem.register();
 
         configureButtonBindings();
@@ -86,6 +88,11 @@ public class RobotContainer {
     private void configureButtonBindings() {
         // Reset gyro Button
         mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+
+                // Run flywheel at max while the button is held
+                mController.button(6)
+                                .onTrue(Commands.runOnce(() -> Flywheel.setSpeed(Flywheel.kMaxRpm), Flywheel))
+                                .onFalse(Commands.runOnce(() -> Flywheel.setSpeed(0), Flywheel));
         // Run Intake buttons
         mController.pov(0)
                 .onTrue(IntakeCommands.runIntake(intakeSubsystem, 1))
@@ -117,5 +124,4 @@ public class RobotContainer {
                 .onTrue(TurretCommands.runRotation(turretRotation, -0.2))
                 .onFalse(TurretCommands.stop(turretRotation));
     }
-
 }

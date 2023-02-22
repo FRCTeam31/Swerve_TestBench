@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.*;
@@ -14,6 +18,10 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
     public Drivetrain Drivetrain;
     private IntakeSubsystem intakeSubsystem;
+    private Compressor compressor;
+
+    public Solenoid leftSolenoid;
+    public Solenoid rightSolenoid;
     private TurretRotation turretRotation;
 
     // Front Left
@@ -47,6 +55,10 @@ public class RobotContainer {
     private CommandJoystick mController;
 
     public RobotContainer() {
+
+        compressor = new Compressor(PneumaticsModuleType.CTREPCM);
+        leftSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+        rightSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
 
         SwerveModule[] modules = new SwerveModule[4];
         modules[0] = FrontLeftSwerveModule;
@@ -89,6 +101,16 @@ public class RobotContainer {
                 .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
         // Move intake button
 
+        mController.button(4).onTrue(Commands.runOnce(() -> {
+            leftSolenoid.set(true);
+            rightSolenoid.set(true);
+        }));
+
+        mController.button(5).onTrue(Commands.runOnce(() -> {
+            leftSolenoid.set(false);
+            rightSolenoid.set(false);
+        }));
+
         // Move turret left
         mController.pov(90)
                 .onTrue(TurretCommands.runRotation(turretRotation, 0.2))
@@ -98,6 +120,6 @@ public class RobotContainer {
         mController.pov(270)
                 .onTrue(TurretCommands.runRotation(turretRotation, -0.2))
                 .onFalse(TurretCommands.stop(turretRotation));
-
     }
+
 }

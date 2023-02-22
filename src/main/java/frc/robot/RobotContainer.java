@@ -7,14 +7,14 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import frc.robot.commands.DriveCommands;
+import frc.robot.commands.*;
 import frc.robot.config.DriveMap;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.*;
 
 /** Add your docs here. */
 public class RobotContainer {
         private Drivetrain Drivetrain;
+        private TurretRotation turretRotation;
 
         // Front Left
         public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -54,6 +54,8 @@ public class RobotContainer {
                 modules[2] = RearLeftSwerveModule;
                 modules[3] = RearRightSwerveModule;
 
+                turretRotation = new TurretRotation();
+
                 mController = new CommandJoystick(0);
                 Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
                                 RearRightSwerveModule);
@@ -65,6 +67,17 @@ public class RobotContainer {
 
         private void configureButtonBindings() {
                 mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
-        }
+                mController.pov(90).onTrue(Commands.run(() -> {
+                        TurretCommands.runRotation(turretRotation, 0.5);
+                }, turretRotation)).onFalse(Commands.run(() -> {
+                        turretRotation.stop();
+                }, turretRotation));
 
+                mController.pov(270).onTrue(Commands.run(() -> {
+                        TurretCommands.runRotation(turretRotation, -0.5);
+                }, turretRotation)).onFalse(Commands.run(() -> {
+                        turretRotation.stop();
+                }, turretRotation));
+
+        }
 }

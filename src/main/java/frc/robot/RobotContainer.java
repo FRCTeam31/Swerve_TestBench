@@ -72,11 +72,11 @@ public class RobotContainer {
 
         turretRotation = new TurretRotation();
 
-                mController = new CommandJoystick(0);
-                Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
-                                RearRightSwerveModule);
-                Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
-                Drivetrain.register();
+        mController = new CommandJoystick(0);
+        Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
+                RearRightSwerveModule);
+        Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
+        Drivetrain.register();
 
                 Flywheel = new Flywheel();
                 intakeSubsystem = new IntakeSubsystem();
@@ -89,39 +89,17 @@ public class RobotContainer {
         // Reset gyro Button
         mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
 
-                // Run flywheel at max while the button is held
-                mController.button(6)
-                                .onTrue(Commands.runOnce(() -> Flywheel.setSpeed(Flywheel.kMaxRpm), Flywheel))
-                                .onFalse(Commands.runOnce(() -> Flywheel.setSpeed(0), Flywheel));
-        // Run Intake buttons
-        mController.pov(0)
-                .onTrue(IntakeCommands.runIntake(intakeSubsystem, 1))
-                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
-
-        mController.pov(180)
-                .onTrue(IntakeCommands.runIntake(intakeSubsystem, -1))
-                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
-
-        // Move intake button
-
-        mController.button(4).onTrue(Commands.runOnce(() -> {
-            leftSolenoid.set(true);
-            rightSolenoid.set(true);
-        }));
-
-        mController.button(5).onTrue(Commands.runOnce(() -> {
-            leftSolenoid.set(false);
-            rightSolenoid.set(false);
-        }));
-
-        // Move turret left
-        mController.pov(90)
-                .onTrue(TurretCommands.runRotation(turretRotation, 0.2))
-                .onFalse(TurretCommands.stop(turretRotation));
-
-        // Move turret right
-        mController.pov(270)
-                .onTrue(TurretCommands.runRotation(turretRotation, -0.2))
-                .onFalse(TurretCommands.stop(turretRotation));
+        // Run flywheel at 75% speed when "Start" is pressed, and turn it off when it's
+        // pressed again
+        mController.button(8)
+                .onTrue(Commands.runOnce(() -> {
+                    if (Flywheel.getEnabled()) {
+                        Flywheel.setSpeed(0);
+                        Flywheel.setEnabled(false);
+                    } else {
+                        Flywheel.setSpeed(Flywheel.kMaxRpm * 0.75);
+                        Flywheel.setEnabled(true);
+                    }
+                }, Flywheel));
     }
 }

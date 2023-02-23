@@ -10,27 +10,29 @@ import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class IntakeCommands extends CommandBase {
-  public static Command runIntake(IntakeSubsystem intakeSubsystem, int direction) {
-    return Commands.run(() -> {
+    public static Command runIntake(IntakeSubsystem intakeSubsystem, int direction) {
+        return Commands.runOnce(() -> {
 
-      intakeSubsystem.runIntake(0.5 * direction);
+            intakeSubsystem.runIntake(0.5 * direction);
 
-    }, intakeSubsystem);
+        }, intakeSubsystem);
 
-  }
+    }
 
-  public static Command stopIntake(IntakeSubsystem intakeSubsystem) {
-    return Commands.run(() -> {
-      intakeSubsystem.stopIntake();
-    }, intakeSubsystem);
-  }
+    public static Command stopIntake(IntakeSubsystem intakeSubsystem) {
+        return Commands.runOnce(() -> {
+            intakeSubsystem.stopIntake();
+        });
+    }
 
-  public static Command moveIntake(IntakeSubsystem intakeSubsystem, boolean direction) {
+    public static Command setIntakeCommand(IntakeSubsystem intakeSubsystem, boolean out) {
+        return Commands.runOnce(() -> {
+            if (out)
+                System.out.println("Setting intake out");
+            else
+                System.out.println("Setting intake in");
 
-    return Commands.runOnce(() -> {
-      intakeSubsystem.moveIntake(direction);
-    }, intakeSubsystem);
-
-  }
-
+            intakeSubsystem.setIntakeOut(out);
+        });
+    }
 }

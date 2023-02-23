@@ -10,50 +10,43 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.IntakeMap;
 
 public class IntakeSubsystem extends SubsystemBase {
+    private WPI_TalonSRX intakeMotor;
+    private WPI_TalonSRX elevatorIntakeMotor;
 
-  private WPI_TalonSRX intakeMotor;
-  private WPI_TalonSRX elevatorIntakeMotor;
+    private Compressor compressor;
+    private DoubleSolenoid intakeArmSolenoid;
 
-  private Compressor compressor;
-  private Solenoid leftSolenoid;
-  private Solenoid rightSolenoid;
+    public IntakeSubsystem() {
+        // Set up Motors
+        intakeMotor = new WPI_TalonSRX(IntakeMap.kIntakeMotorId);
+        intakeMotor.setInverted(true);
+        elevatorIntakeMotor = new WPI_TalonSRX(IntakeMap.kElevatorIntakeMotor);
 
-  /** Creates a new intakeSubsystem. */
+        compressor = new Compressor(PneumaticsModuleType.CTREPCM);
+        compressor.enableDigital();
 
-  public IntakeSubsystem() {
-    // Set up Motors
-    intakeMotor = new WPI_TalonSRX(IntakeMap.kIntakeMotorId);
-    elevatorIntakeMotor = new WPI_TalonSRX(IntakeMap.kElevatorIntakeMotor);
-    elevatorIntakeMotor.setInverted(true);
+        intakeArmSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 1);
+    }
 
-    compressor = new Compressor(PneumaticsModuleType.CTREPCM);
-    compressor.enableDigital();
+    public void runIntake(double speed) {
+        intakeMotor.set(ControlMode.PercentOutput, speed);
+        elevatorIntakeMotor.set(ControlMode.PercentOutput, speed);
+    }
 
-    leftSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
-    rightSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 3);
+    public void stopIntake() {
+        intakeMotor.stopMotor();
+        elevatorIntakeMotor.stopMotor();
+    }
 
-    // Set up pneumatics
-  }
-
-  public void runIntake(double speed) {
-    intakeMotor.set(ControlMode.PercentOutput, speed);
-    elevatorIntakeMotor.set(ControlMode.PercentOutput, speed);
-  }
-
-  public void stopIntake() {
-    intakeMotor.stopMotor();
-    elevatorIntakeMotor.stopMotor();
-  }
-
-  public void moveIntake(boolean direction) {
-    leftSolenoid.set(direction);
-    rightSolenoid.set(direction);
-  }
-
+    public void setIntakeOut(boolean out) {
+        intakeArmSolenoid.set(out ? Value.kForward : Value.kReverse);
+    }
 }

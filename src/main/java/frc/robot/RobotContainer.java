@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import javax.naming.NotContextException;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -59,6 +61,7 @@ public class RobotContainer {
         compressor = new Compressor(PneumaticsModuleType.CTREPCM);
         leftSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
         rightSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
+        intakeSubsystem = new IntakeSubsystem();
 
         SwerveModule[] modules = new SwerveModule[4];
         modules[0] = FrontLeftSwerveModule;
@@ -82,23 +85,16 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         // Reset gyro Button
-        // Reset Gyro
         mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
         // Run Intake buttons
-        mController.pov(180)
-                .onTrue(Commands.run(() -> {
-
-                    intakeSubsystem.runIntake(0.5 * -1);
-
-                }, intakeSubsystem))
-                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
         mController.pov(0)
-                .onTrue(Commands.run(() -> {
-
-                    intakeSubsystem.runIntake(0.5 * 1);
-
-                }, intakeSubsystem))
+                .onTrue(IntakeCommands.runIntake(intakeSubsystem, 1))
                 .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+
+        mController.pov(180)
+                .onTrue(IntakeCommands.runIntake(intakeSubsystem, -1))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+
         // Move intake button
 
         mController.button(4).onTrue(Commands.runOnce(() -> {

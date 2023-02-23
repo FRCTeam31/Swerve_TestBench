@@ -1,27 +1,29 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import prime.movers.LazyCANSparkMax;
 
 public class Flywheel extends SubsystemBase {
-    private final int rightNeoId = 18;
-    private final int leftNeoId = 19;
-    private CANSparkMax neoRight;
-    private CANSparkMax neoLeft;
+    public final int kMaxRpm = 3000;
+
+    private final int kRightNeoId = 18;
+    private final int kLeftNeoId = 19;
+    private double _lastRpmSet = 0;
+    private boolean _flywheelEnabled = false;
+
+    private LazyCANSparkMax neoRight;
+    private LazyCANSparkMax neoLeft;
     private SparkMaxPIDController mPidController;
-    public final static int kMaxRpm = 3000;
-    private int _lastRpmSet = 0;
 
     public Flywheel() {
-        neoRight = new CANSparkMax(rightNeoId, MotorType.kBrushless);
+        neoRight = new LazyCANSparkMax(kRightNeoId, MotorType.kBrushless);
         neoRight.setClosedLoopRampRate(3);
 
-        neoLeft = new CANSparkMax(leftNeoId, MotorType.kBrushless);
+        neoLeft = new LazyCANSparkMax(kLeftNeoId, MotorType.kBrushless);
         neoLeft.follow(neoRight, true);
 
         neoRight.restoreFactoryDefaults();
@@ -32,16 +34,27 @@ public class Flywheel extends SubsystemBase {
         mPidController.setP(0.001);
     }
 
-    public void setEnabled(boolean enabled) {
-        if (enabled) {
+    @Override
+    public void periodic() {
+        if (_flywheelEnabled) {
             mPidController.setReference(_lastRpmSet, ControlType.kVelocity);
         } else {
-            mPidController.setReference(0, ControlType.kDutyCycle);
-            neoRight.stopMotor();
+            if (neoRight.get() != 0) {
+                mPidController.setReference(0, ControlType.kVelocity);
+                neoRight.stopMotor();
+            }
         }
     }
 
-    public void setSpeed(int rpm) {
+    public void setEnabled(boolean enabled) {
+        _flywheelEnabled = enabled;
+    }
+
+    public boolean getEnabled() {
+        return _flywheelEnabled;
+    }
+
+    public void setSpeed(double rpm) {
         if (rpm != _lastRpmSet) {
             mPidController.setReference(rpm, ControlType.kVelocity);
             _lastRpmSet = rpm;

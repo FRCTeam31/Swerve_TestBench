@@ -12,64 +12,72 @@ import frc.robot.subsystems.*;
 
 /** Add your docs here. */
 public class RobotContainer {
-        private Drivetrain Drivetrain;
-        private Flywheel Flywheel;
+    private Drivetrain Drivetrain;
+    private Flywheel Flywheel;
 
-        // Front Left
-        public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
-                        DriveMap.kFrontLeftDrivingMotorId,
-                        DriveMap.kFrontLeftSteeringMotorId,
-                        DriveMap.kFrontLeftEncoderAIOChannel,
-                        DriveMap.kFrontLeftEncoderOffset);
+    // Front Left
+    public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
+            DriveMap.kFrontLeftDrivingMotorId,
+            DriveMap.kFrontLeftSteeringMotorId,
+            DriveMap.kFrontLeftEncoderAIOChannel,
+            DriveMap.kFrontLeftEncoderOffset);
 
-        // Front Right
-        public final SwerveModule FrontRightSwerveModule = new SwerveModule(
-                        DriveMap.kFrontRightDrivingMotorId,
-                        DriveMap.kFrontRightSteeringMotorId,
-                        DriveMap.kFrontRightEncoderAIOChannel,
-                        DriveMap.kFrontRightEncoderOffset);
+    // Front Right
+    public final SwerveModule FrontRightSwerveModule = new SwerveModule(
+            DriveMap.kFrontRightDrivingMotorId,
+            DriveMap.kFrontRightSteeringMotorId,
+            DriveMap.kFrontRightEncoderAIOChannel,
+            DriveMap.kFrontRightEncoderOffset);
 
-        // Rear Left
-        public final SwerveModule RearLeftSwerveModule = new SwerveModule(
-                        DriveMap.kRearLeftDrivingMotorId,
-                        DriveMap.kRearLeftSteeringMotorId,
-                        DriveMap.kRearLeftEncoderAIOChannel,
-                        DriveMap.kRearLeftEncoderOffset);
+    // Rear Left
+    public final SwerveModule RearLeftSwerveModule = new SwerveModule(
+            DriveMap.kRearLeftDrivingMotorId,
+            DriveMap.kRearLeftSteeringMotorId,
+            DriveMap.kRearLeftEncoderAIOChannel,
+            DriveMap.kRearLeftEncoderOffset);
 
-        // Rear Right
-        public final SwerveModule RearRightSwerveModule = new SwerveModule(
-                        DriveMap.kRearRightDrivingMotorId,
-                        DriveMap.kRearRightSteeringMotorId,
-                        DriveMap.kRearRightEncoderAIOChannel,
-                        DriveMap.kRearRightEncoderOffset);
+    // Rear Right
+    public final SwerveModule RearRightSwerveModule = new SwerveModule(
+            DriveMap.kRearRightDrivingMotorId,
+            DriveMap.kRearRightSteeringMotorId,
+            DriveMap.kRearRightEncoderAIOChannel,
+            DriveMap.kRearRightEncoderOffset);
 
-        private CommandJoystick mController;
+    private CommandJoystick mController;
 
-        public RobotContainer() {
+    public RobotContainer() {
 
-                SwerveModule[] modules = new SwerveModule[4];
-                modules[0] = FrontLeftSwerveModule;
-                modules[1] = FrontRightSwerveModule;
-                modules[2] = RearLeftSwerveModule;
-                modules[3] = RearRightSwerveModule;
+        SwerveModule[] modules = new SwerveModule[4];
+        modules[0] = FrontLeftSwerveModule;
+        modules[1] = FrontRightSwerveModule;
+        modules[2] = RearLeftSwerveModule;
+        modules[3] = RearRightSwerveModule;
 
-                mController = new CommandJoystick(0);
-                Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
-                                RearRightSwerveModule);
-                Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
-                Drivetrain.register();
+        mController = new CommandJoystick(0);
+        Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
+                RearRightSwerveModule);
+        Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
+        Drivetrain.register();
 
-                Flywheel = new Flywheel();
+        Flywheel = new Flywheel();
 
-                configureButtonBindings();
-        }
+        configureButtonBindings();
+    }
 
-        private void configureButtonBindings() {
-                mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+    private void configureButtonBindings() {
+        mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
 
-                // Run flywheel at max while the button is held
-                mController.button(6)
-                                .onTrue(Commands.runOnce(() -> Flywheel.setSpeed(Flywheel.kMaxRpm), Flywheel))
-                                .onFalse(Commands.runOnce(() -> Flywheel.setSpeed(0), Flywheel));
-        }
+        // Run flywheel at 75% speed when "Start" is pressed, and turn it off when it's
+        // pressed again
+        mController.button(8)
+                .onTrue(Commands.runOnce(() -> {
+                    if (Flywheel.getEnabled()) {
+                        Flywheel.setSpeed(0);
+                        Flywheel.setEnabled(false);
+                    } else {
+                        Flywheel.setSpeed(Flywheel.kMaxRpm * 0.75);
+                        Flywheel.setEnabled(true);
+                    }
+                }, Flywheel));
+    }
 }

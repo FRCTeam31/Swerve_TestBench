@@ -6,9 +6,11 @@ import frc.robot.subsystems.TurretRotation;
 
 public class TurretCommands {
     public static Command runRotation(TurretRotation turret, double speed) {
-        return Commands.runOnce(() -> {
-            turret.rotate(speed);
-        });
+        return Commands.runOnce(() -> turret.rotate(speed));
+    }
+
+    public static Command stop(TurretRotation turret) {
+        return Commands.runOnce(() -> turret.stop());
     }
 
 }

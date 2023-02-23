@@ -65,18 +65,18 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
+        // Reset Gyro
         mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
-        mController.pov(90).onTrue(Commands.run(() -> {
-            TurretCommands.runRotation(turretRotation, 0.5);
-        }, turretRotation)).onFalse(Commands.run(() -> {
-            turretRotation.stop();
-        }, turretRotation));
 
-        mController.pov(270).onTrue(Commands.run(() -> {
-            TurretCommands.runRotation(turretRotation, -0.5);
-        }, turretRotation)).onFalse(Commands.run(() -> {
-            turretRotation.stop();
-        }, turretRotation));
+        // Move turret left
+        mController.pov(90)
+                .onTrue(TurretCommands.runRotation(turretRotation, 0.2))
+                .onFalse(TurretCommands.stop(turretRotation));
+
+        // Move turret right
+        mController.pov(270)
+                .onTrue(TurretCommands.runRotation(turretRotation, -0.2))
+                .onFalse(TurretCommands.stop(turretRotation));
 
     }
 }

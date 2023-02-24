@@ -4,15 +4,23 @@
 
 package frc.robot;
 
+import javax.naming.NotContextException;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.config.DriveMap;
 import frc.robot.subsystems.*;
 
 /** Add your docs here. */
 public class RobotContainer {
     private Drivetrain Drivetrain;
+    private IntakeSubsystem intakeSubsystem;
     private Flywheel Flywheel;
 
     // Front Left
@@ -46,6 +54,7 @@ public class RobotContainer {
     private CommandJoystick mController;
 
     public RobotContainer() {
+        intakeSubsystem = new IntakeSubsystem();
 
         SwerveModule[] modules = new SwerveModule[4];
         modules[0] = FrontLeftSwerveModule;
@@ -85,5 +94,19 @@ public class RobotContainer {
                         Flywheel.setEnabled(true);
                     }
                 }, Flywheel));
+        // Run intake in and out
+        // Left and right pov
+        mController.pov(0)
+                .onTrue(IntakeCommands.runIntake(intakeSubsystem, 1))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+
+        mController.pov(180)
+                .onTrue(IntakeCommands.runIntake(intakeSubsystem, -1))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+
+        // Move intake in and out
+        // Bumpers
+        mController.button(5).onTrue(IntakeCommands.setIntakeCommand(intakeSubsystem, true));
+        mController.button(6).onTrue(IntakeCommands.setIntakeCommand(intakeSubsystem, false));
     }
 }

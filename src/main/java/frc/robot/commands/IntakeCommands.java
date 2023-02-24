@@ -4,16 +4,17 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 
 public class IntakeCommands extends CommandBase {
-    public static Command runIntake(IntakeSubsystem intakeSubsystem, int direction) {
-        return Commands.runOnce(() -> {
-
-            intakeSubsystem.runIntake(0.5 * direction);
+    public static Command runIntake(IntakeSubsystem intakeSubsystem, CommandJoystick mController) {
+        return Commands.run(() -> {
+            intakeSubsystem.runIntake(MathUtil.applyDeadband(-mController.getRawAxis(5), 0.5));
 
         }, intakeSubsystem);
 

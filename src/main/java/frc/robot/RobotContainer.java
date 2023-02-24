@@ -54,7 +54,6 @@ public class RobotContainer {
     private CommandJoystick mController;
 
     public RobotContainer() {
-        intakeSubsystem = new IntakeSubsystem();
 
         SwerveModule[] modules = new SwerveModule[4];
         modules[0] = FrontLeftSwerveModule;
@@ -67,6 +66,10 @@ public class RobotContainer {
                 RearRightSwerveModule);
         Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
         Drivetrain.register();
+
+        intakeSubsystem = new IntakeSubsystem();
+        intakeSubsystem.setDefaultCommand(IntakeCommands.runIntake(intakeSubsystem, mController));
+        intakeSubsystem.register();
 
         Flywheel = new Flywheel();
 
@@ -96,13 +99,6 @@ public class RobotContainer {
                 }, Flywheel));
         // Run intake in and out
         // Left and right pov
-        mController.pov(0)
-                .onTrue(IntakeCommands.runIntake(intakeSubsystem, 1))
-                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
-
-        mController.pov(180)
-                .onTrue(IntakeCommands.runIntake(intakeSubsystem, -1))
-                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
 
         // Move intake in and out
         // Bumpers

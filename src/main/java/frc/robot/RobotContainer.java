@@ -106,5 +106,19 @@ public class RobotContainer {
                         Flywheel.setEnabled(true);
                     }
                 }, Flywheel));
+        // Run intake in and out
+        // Left and right pov
+        mController.pov(0)
+                .onTrue(IntakeCommands.runIntake(intakeSubsystem, 1))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+
+        mController.pov(180)
+                .onTrue(IntakeCommands.runIntake(intakeSubsystem, -1))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+
+        // Move intake in and out
+        // Bumpers
+        mController.button(5).onTrue(IntakeCommands.setIntakeCommand(intakeSubsystem, true));
+        mController.button(6).onTrue(IntakeCommands.setIntakeCommand(intakeSubsystem, false));
     }
 }

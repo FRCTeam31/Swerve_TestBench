@@ -86,8 +86,11 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        // Reset gyro Button
+        // Reset drivetrain gyro heading
         mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+
+        // Shift drive speed
+        mController.button(1).onTrue(DriveCommands.shiftDriveSpeedCommand(Drivetrain));
 
         // Run flywheel at 75% speed when "Start" is pressed, and turn it off when it's
         // pressed again

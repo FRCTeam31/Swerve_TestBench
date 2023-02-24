@@ -1,6 +1,6 @@
 package frc.robot.config;
 
-import frc.robot.prime.models.PidConstants;
+import prime.models.PidConstants;
 
 public class RobotMap {
   public static final double kRobotTrackWidthInches = 24.5;

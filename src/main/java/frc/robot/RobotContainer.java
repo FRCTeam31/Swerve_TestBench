@@ -75,7 +75,7 @@ public class RobotContainer {
         mController = new CommandJoystick(0);
         Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
                 RearRightSwerveModule);
-        Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
+        Drivetrain.setDefaultCommand(DriveCommands.defaultDriveCommand(mController, Drivetrain, modules));
         Drivetrain.register();
 
                 Flywheel = new Flywheel();

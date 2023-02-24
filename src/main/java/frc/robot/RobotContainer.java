@@ -4,7 +4,12 @@
 
 package frc.robot;
 
+import javax.naming.NotContextException;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.*;
@@ -14,6 +19,8 @@ import frc.robot.subsystems.*;
 /** Add your docs here. */
 public class RobotContainer {
     private Drivetrain Drivetrain;
+    private IntakeSubsystem intakeSubsystem;
+    private Flywheel Flywheel;
     private TurretRotation turretRotation;
 
     // Front Left
@@ -47,6 +54,7 @@ public class RobotContainer {
     private CommandJoystick mController;
 
     public RobotContainer() {
+        intakeSubsystem = new IntakeSubsystem();
 
         SwerveModule[] modules = new SwerveModule[4];
         modules[0] = FrontLeftSwerveModule;
@@ -62,12 +70,46 @@ public class RobotContainer {
         Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
         Drivetrain.register();
 
+        Flywheel = new Flywheel();
+
         configureButtonBindings();
     }
 
     private void configureButtonBindings() {
-        // Reset Gyro
-        mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+        // Reset drivetrain gyro heading
+        mController.button(3) // Y button
+                .onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+
+        // Shift drive speed
+        mController.button(1) // A button
+                .onTrue(DriveCommands.shiftDriveSpeedCommand(Drivetrain));
+
+        // Run flywheel at 75% speed when Start is pressed, and turn it off when it's
+        // pressed again
+        mController.button(8) // Start button
+                .onTrue(Commands.runOnce(() -> {
+                    if (Flywheel.getEnabled()) {
+                        Flywheel.setSpeed(0);
+                        Flywheel.setEnabled(false);
+                    } else {
+                        Flywheel.setSpeed(Flywheel.kMaxRpm * 0.75);
+                        Flywheel.setEnabled(true);
+                    }
+                }, Flywheel));
+        // Run intake in and out
+        // Left and right pov
+        mController.pov(0)
+                .onTrue(IntakeCommands.runIntake(intakeSubsystem, 1))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+
+        mController.pov(180)
+                .onTrue(IntakeCommands.runIntake(intakeSubsystem, -1))
+                .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
+
+        // Move intake in and out
+        // Bumpers
+        mController.button(5).onTrue(IntakeCommands.setIntakeCommand(intakeSubsystem, true));
+        mController.button(6).onTrue(IntakeCommands.setIntakeCommand(intakeSubsystem, false));
 
         // Move turret left
         mController.pov(90)
@@ -78,6 +120,5 @@ public class RobotContainer {
         mController.pov(270)
                 .onTrue(TurretCommands.runRotation(turretRotation, -0.2))
                 .onFalse(TurretCommands.stop(turretRotation));
-
     }
 }

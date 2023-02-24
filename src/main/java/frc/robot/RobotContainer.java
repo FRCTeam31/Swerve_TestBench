@@ -4,15 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.DriveCommands;
 import frc.robot.config.DriveMap;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.*;
 
 /** Add your docs here. */
 public class RobotContainer {
     private Drivetrain Drivetrain;
+    private Flywheel Flywheel;
 
     // Front Left
     public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -58,13 +59,31 @@ public class RobotContainer {
         Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
         Drivetrain.register();
 
+        Flywheel = new Flywheel();
+
         configureButtonBindings();
     }
 
     private void configureButtonBindings() {
-        mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+        // Reset drivetrain gyro heading
+        mController.button(3) // Y button
+                .onTrue(DriveCommands.resetGyroComamand(Drivetrain));
 
-        mController.button(1).onTrue(DriveCommands.shiftDriveSpeedCommand(Drivetrain));
+        // Shift drive speed
+        mController.button(1) // A button
+                .onTrue(DriveCommands.shiftDriveSpeedCommand(Drivetrain));
+
+        // Run flywheel at 75% speed when Start is pressed, and turn it off when it's
+        // pressed again
+        mController.button(8) // Start button
+                .onTrue(Commands.runOnce(() -> {
+                    if (Flywheel.getEnabled()) {
+                        Flywheel.setSpeed(0);
+                        Flywheel.setEnabled(false);
+                    } else {
+                        Flywheel.setSpeed(Flywheel.kMaxRpm * 0.75);
+                        Flywheel.setEnabled(true);
+                    }
+                }, Flywheel));
     }
-
 }

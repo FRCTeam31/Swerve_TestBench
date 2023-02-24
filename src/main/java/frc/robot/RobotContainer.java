@@ -15,14 +15,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.config.DriveMap;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.*;
 
 /** Add your docs here. */
 public class RobotContainer {
     private Drivetrain Drivetrain;
     private IntakeSubsystem intakeSubsystem;
+    private Flywheel Flywheel;
 
     // Front Left
     public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -67,16 +66,35 @@ public class RobotContainer {
         Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
                 RearRightSwerveModule);
         Drivetrain.setDefaultCommand(DriveCommands.DefaultDriveCommand(mController, Drivetrain, modules));
+        Drivetrain.register();
 
-        // intakeSubsystem = new IntakeSubsystem();
-        // intakeSubsystem.register();
+        Flywheel = new Flywheel();
 
         configureButtonBindings();
     }
 
     private void configureButtonBindings() {
-        // Reset gyro Button
-        mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+        // Reset drivetrain gyro heading
+        mController.button(3) // Y button
+                .onTrue(DriveCommands.resetGyroComamand(Drivetrain));
+
+        // Shift drive speed
+        mController.button(1) // A button
+                .onTrue(DriveCommands.shiftDriveSpeedCommand(Drivetrain));
+
+        // Run flywheel at 75% speed when Start is pressed, and turn it off when it's
+        // pressed again
+        mController.button(8) // Start button
+                .onTrue(Commands.runOnce(() -> {
+                    if (Flywheel.getEnabled()) {
+                        Flywheel.setSpeed(0);
+                        Flywheel.setEnabled(false);
+                    } else {
+                        Flywheel.setSpeed(Flywheel.kMaxRpm * 0.75);
+                        Flywheel.setEnabled(true);
+                    }
+                }, Flywheel));
+
         // Run Intake buttons
         mController.pov(0)
                 .onTrue(IntakeCommands.runIntake(intakeSubsystem, 1))
@@ -87,9 +105,7 @@ public class RobotContainer {
                 .onFalse(IntakeCommands.stopIntake(intakeSubsystem));
 
         // Move intake button
-
         mController.button(5).onTrue(IntakeCommands.setIntakeCommand(intakeSubsystem, true));
         mController.button(6).onTrue(IntakeCommands.setIntakeCommand(intakeSubsystem, false));
     }
-
 }

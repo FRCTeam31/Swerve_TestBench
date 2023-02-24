@@ -25,6 +25,9 @@ public class DriveCommands {
 
     public static Command resetGyroComamand(Drivetrain driveTrain) {
         return Commands.runOnce(() -> driveTrain.resetGyro(), driveTrain);
+    }
 
+    public static Command shiftDriveSpeedCommand(Drivetrain driveTrain) {
+        return Commands.runOnce(() -> driveTrain.toggleDriveShifter(), driveTrain);
     }
 }

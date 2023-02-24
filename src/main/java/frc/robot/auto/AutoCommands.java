@@ -12,6 +12,7 @@ import com.pathplanner.lib.commands.FollowPathWithEvents;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.Drivetrain;
 
 public final class AutoCommands {
     public static HashMap<String, Command> EventMap = new HashMap<>(Map.ofEntries(
@@ -25,10 +26,10 @@ public final class AutoCommands {
         return PathPlanner.loadPath(pathName, new PathConstraints(2, 1));
     }
 
-    public static Command runAutoPath(String pathName, DriveCommands driveCommands) {
+    public static Command runAutoPath(String pathName, DriveCommands driveCommands, Drivetrain drivetrain) {
         var path = getAutoPath(pathName);
 
-        return new FollowPathWithEvents(driveCommands.followTrajectoryWithEvents(path, true), path.getMarkers(),
+        return new FollowPathWithEvents(driveCommands.followTrajectoryWithEvents(drivetrain, path, true), path.getMarkers(),
                 EventMap);
     }
 }

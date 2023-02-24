@@ -12,8 +12,7 @@ import frc.robot.subsystems.SwerveModule;
 
 /** Add your docs here. */
 public class RobotContainer {
-    private Drivetrain mDrivetrain;
-    private DriveCommands mDriveCommands;
+    public Drivetrain Drivetrain;
 
     // Front Left
     public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -54,17 +53,16 @@ public class RobotContainer {
         modules[3] = RearRightSwerveModule;
 
         mController = new CommandJoystick(0);
-        mDrivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
+        Drivetrain = new Drivetrain(FrontLeftSwerveModule, FrontRightSwerveModule, RearLeftSwerveModule,
                 RearRightSwerveModule);
-        mDriveCommands = new DriveCommands(mDrivetrain, modules);
-        mDrivetrain.setDefaultCommand(mDriveCommands.DefaultDriveCommand(mController));
-        mDrivetrain.register();
+        Drivetrain.setDefaultCommand(DriveCommands.defaultDriveCommand(mController, Drivetrain, modules));
+        Drivetrain.register();
 
         configureButtonBindings();
     }
 
     private void configureButtonBindings() {
-        mController.button(3).onTrue(mDriveCommands.resetGyroComamand());
+        mController.button(3).onTrue(DriveCommands.resetGyroComamand(Drivetrain));
     }
 
 }

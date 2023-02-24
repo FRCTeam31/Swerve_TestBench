@@ -19,50 +19,38 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.SwerveModule;
 
 public class DriveCommands {
-	private Drivetrain mDrivetrain;
-	private SwerveModule[] mSwerveModules;
+    public static Command defaultDriveCommand(CommandJoystick controller, Drivetrain driveTrain,
+            SwerveModule[] swerveModules) {
+        return Commands.run(() -> {
+            var strafeX = MathUtil.applyDeadband(controller.getRawAxis(0), 0.1);
+            var forwardY = -MathUtil.applyDeadband(controller.getRawAxis(1), 0.1);
+            var rotation = controller.getRawAxis(2) - controller.getRawAxis(3);
 
-	public DriveCommands(Drivetrain drivetrain, SwerveModule[] swerveModules) {
-		mDrivetrain = drivetrain;
-		mSwerveModules = swerveModules;
-	}
+            driveTrain.drive(strafeX, forwardY, rotation, false);
+        }, driveTrain, swerveModules[0], swerveModules[1], swerveModules[2], swerveModules[3]);
+    }
 
-	public Command DefaultDriveCommand(CommandJoystick controller) {
-		return Commands.run(() -> {
-			var strafeX = MathUtil.applyDeadband(controller.getRawAxis(0), 0.1);
-			var forwardY = -MathUtil.applyDeadband(controller.getRawAxis(1), 0.1);
-			var rotation = controller.getRawAxis(2) - controller.getRawAxis(3);
+    public static Command resetGyroComamand(Drivetrain driveTrain) {
+        return Commands.runOnce(() -> driveTrain.resetGyro(), driveTrain);
+    }
 
-			mDrivetrain.drive(strafeX, forwardY, rotation, false);
-		}, mDrivetrain, mSwerveModules[0], mSwerveModules[1], mSwerveModules[2], mSwerveModules[3]);
-	}
-
-	public Command resetGyroComamand() {
-		return Commands.runOnce(() -> mDrivetrain.resetGyro(), mDrivetrain);
-	}
-
-	public Command followTrajectoryWithEvents(PathPlannerTrajectory trajectory, boolean isFirstPath) {
-		return new SequentialCommandGroup(
-				new InstantCommand(() -> {
-					// Reset odometry for the first path you run during auto
-					if (isFirstPath) {
-						mDrivetrain.resetOdometry(trajectory.getInitialHolonomicPose());
-					}
-				}),
-				new PPSwerveControllerCommand(
-						trajectory,
-						mDrivetrain::getPose, // Pose supplier
-						new PIDController(0, 0, 0), // X controller. Tune these values for your robot. Leaving them 0
-													// will only use feedforwards.
-						new PIDController(0, 0, 0), // Y controller (usually the same values as X controller)
-						new PIDController(0, 0, 0), // Rotation controller. Tune these values for your robot. Leaving
-													// them 0 will only use feedforwards.
-						mDrivetrain::drive,
-						getAllDriveSubsystems()));
-	}
-
-	private Subsystem[] getAllDriveSubsystems() {
-		return new Subsystem[] { mDrivetrain, mSwerveModules[0], mSwerveModules[1], mSwerveModules[2],
-				mSwerveModules[3] };
-	}
+    public static Command followTrajectoryWithEvents(Drivetrain drivetrain, PathPlannerTrajectory trajectory, boolean isFirstPath) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    // Reset odometry for the first path you run during auto
+                    if (isFirstPath) {
+                        drivetrain.resetOdometry(trajectory.getInitialHolonomicPose());
+                    }
+                }),
+                new PPSwerveControllerCommand(
+                        trajectory,
+                        drivetrain::getPose, // Pose supplier
+                        new PIDController(0, 0, 0), // X controller. Tune these values for your robot. Leaving them 0
+                                                    // will only use feedforwards.
+                        new PIDController(0, 0, 0), // Y controller (usually the same values as X controller)
+                        new PIDController(0, 0, 0), // Rotation controller. Tune these values for your robot. Leaving
+                                                    // them 0 will only use feedforwards.
+                        drivetrain::drive,
+                        drivetrain));
+    }
 }

@@ -4,11 +4,17 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
     private RobotContainer mRobotContainer;
+    private Command mAutoCommand;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -18,6 +24,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         mRobotContainer = new RobotContainer();
+
     }
 
     /**
@@ -36,8 +43,23 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    public void autonomousInit() {
+        if (mAutoCommand != null && mAutoCommand.isScheduled())
+            mAutoCommand.end(true);
+
+        mAutoCommand = mRobotContainer.getAutonomousCommand();
+
+        if (mAutoCommand != null) {
+            mAutoCommand.schedule();
+        }
+
+    }
+
+    @Override
     public void teleopInit() {
         // TODO: Reset gyro
+        if (mAutoCommand != null && mAutoCommand.isScheduled())
+            mAutoCommand.end(true);
 
     }
 }

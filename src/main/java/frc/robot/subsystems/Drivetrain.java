@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.config.DriveMap;
 import frc.robot.prime.models.PidConstants;
@@ -41,6 +42,7 @@ public class Drivetrain extends SubsystemBase {
 
     // Build a gyro and a kinematics class for our drive
     final ADXRS450_Gyro mGyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+
     final SwerveDriveKinematics mKinematics = new SwerveDriveKinematics(
             frontLeftLocation,
             frontRightLocation,
@@ -82,6 +84,10 @@ public class Drivetrain extends SubsystemBase {
         // This method will be called once per scheduler run
         var gyroAngle = mGyro.getRotation2d();
         SmartDashboard.putNumber("Drivetrain gyro angle", gyroAngle.getDegrees());
+        SmartDashboard.putNumber("Front Left Encoder Angle", FrontLeftSwerveModule.mEncoder.getRawValue());
+        SmartDashboard.putNumber("Front Right Encoder Angle", FrontRightSwerveModule.mEncoder.getRawValue());
+        SmartDashboard.putNumber("Rear Left Encoder Angle", RearLeftSwerveModule.mEncoder.getRawValue());
+        SmartDashboard.putNumber("Rear Right Encoder Angle", RearRightSwerveModule.mEncoder.getRawValue());
 
         var robotPose = mOdometry.update(gyroAngle, new SwerveModulePosition[] {
                 FrontLeftSwerveModule.getPosition(), FrontRightSwerveModule.getPosition(),
@@ -106,6 +112,10 @@ public class Drivetrain extends SubsystemBase {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, mGyro.getRotation2d())
                 : new ChassisSpeeds(strafe, forward, rotation);
 
+        drive(desiredChassisSpeeds);
+    }
+
+    public void drive(ChassisSpeeds desiredChassisSpeeds) {
         var swerveModuleStates = mKinematics.toSwerveModuleStates(desiredChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveMap.kDriveMaxSpeedMetersPerSecond);
 
@@ -123,4 +133,19 @@ public class Drivetrain extends SubsystemBase {
     public boolean getDriveShifted() {
         return mDriveShifter;
     }
+
+    public Pose2d getPose() {
+        return mOdometry.getPoseMeters();
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        SwerveModulePosition[] swerveModules = new SwerveModulePosition[4];
+        swerveModules[0] = FrontLeftSwerveModule.getPosition();
+        swerveModules[1] = FrontRightSwerveModule.getPosition();
+        swerveModules[2] = RearLeftSwerveModule.getPosition();
+        swerveModules[3] = RearRightSwerveModule.getPosition();
+
+        mOdometry.resetPosition(mGyro.getRotation2d(), swerveModules, getPose());
+    }
+
 }

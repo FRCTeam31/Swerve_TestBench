@@ -4,12 +4,11 @@
 
 package frc.robot;
 
-import javax.naming.NotContextException;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.*;
@@ -18,10 +17,14 @@ import frc.robot.subsystems.*;
 
 /** Add your docs here. */
 public class RobotContainer {
+
+    // Subsystems
     private Drivetrain Drivetrain;
     private IntakeSubsystem intakeSubsystem;
     private Flywheel Flywheel;
     private TurretRotation turretRotation;
+
+    // Autonomous Paths
 
     // Front Left
     public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
@@ -54,6 +57,7 @@ public class RobotContainer {
     private CommandJoystick mController;
 
     public RobotContainer() {
+
         intakeSubsystem = new IntakeSubsystem();
 
         SwerveModule[] modules = new SwerveModule[4];
@@ -120,5 +124,12 @@ public class RobotContainer {
         mController.pov(270)
                 .onTrue(TurretCommands.runRotation(turretRotation, -0.2))
                 .onFalse(TurretCommands.stop(turretRotation));
+    }
+
+    public Command getAutonomousCommand() {
+        PathPlannerTrajectory driveForwardOneMeter = PathPlanner.loadPath("DriveForwardOneMeter",
+                new PathConstraints(1, 1));
+        return DriveCommands.followTrajectoryWithEvent(Drivetrain, driveForwardOneMeter, true);
+
     }
 }

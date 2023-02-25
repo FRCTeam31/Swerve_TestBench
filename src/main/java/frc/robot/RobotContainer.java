@@ -78,8 +78,8 @@ public class RobotContainer {
         Drivetrain.setDefaultCommand(DriveCommands.defaultDriveCommand(mController, Drivetrain, modules));
         Drivetrain.register();
 
-                Flywheel = new Flywheel();
-                intakeSubsystem = new IntakeSubsystem();
+        Flywheel = new Flywheel();
+        intakeSubsystem = new IntakeSubsystem();
         intakeSubsystem.register();
 
         configureButtonBindings();

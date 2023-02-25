@@ -34,7 +34,12 @@ public class DriveCommands {
         return Commands.runOnce(() -> driveTrain.resetGyro(), driveTrain);
     }
 
-    public static Command followTrajectoryWithEvents(Drivetrain drivetrain, PathPlannerTrajectory trajectory, boolean isFirstPath) {
+    public static Command shiftDriveSpeedCommand(Drivetrain driveTrain) {
+        return Commands.runOnce(() -> driveTrain.toggleDriveShifter(), driveTrain);
+    }
+
+    public static Command followTrajectoryWithEvents(Drivetrain drivetrain, PathPlannerTrajectory trajectory,
+            boolean isFirstPath) {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> {
                     // Reset odometry for the first path you run during auto

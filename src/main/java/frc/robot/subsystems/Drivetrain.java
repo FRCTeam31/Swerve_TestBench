@@ -25,6 +25,7 @@ public class Drivetrain extends SubsystemBase {
     public static final PidConstants kDrivePidConstants = new PidConstants(0.01);
     public static final PidConstants kSteeringPidConstants = new PidConstants(0.75);
     private final Field2d mField = new Field2d();
+    private boolean mDriveShifter = false;
 
     // Initialize "locations" of each wheel in terms of x, y translation in meters
     // from the origin (middle of the robot)
@@ -95,6 +96,12 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void drive(double strafe, double forward, double rotation, boolean fieldRelative) {
+        if (!mDriveShifter) {
+            strafe *= DriveMap.kDriveLowGearCoefficient;
+            forward *= DriveMap.kDriveLowGearCoefficient;
+            rotation *= DriveMap.kDriveLowGearCoefficient;
+        }
+
         var desiredChassisSpeeds = fieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, mGyro.getRotation2d())
                 : new ChassisSpeeds(strafe, forward, rotation);
@@ -110,6 +117,11 @@ public class Drivetrain extends SubsystemBase {
         FrontRightSwerveModule.setDesiredState(swerveModuleStates[1]);
         RearLeftSwerveModule.setDesiredState(swerveModuleStates[2]);
         RearRightSwerveModule.setDesiredState(swerveModuleStates[3]);
+    }
+
+    public void toggleDriveShifter() {
+        mDriveShifter = !mDriveShifter;
+        System.out.println("[DRIVE] shifter");
     }
 
     public Pose2d getPose() {

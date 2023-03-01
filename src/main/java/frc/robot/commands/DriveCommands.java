@@ -28,7 +28,7 @@ public class DriveCommands {
             // var strafeX = 0;
             // var forwardY = 1;
 
-            drivetrain.drive(strafeX, forwardY, rotation, false);
+            drivetrain.drive(strafeX, forwardY, rotation, true);
         }, drivetrain, modules[0], modules[1], modules[2], modules[3]);
     }
 

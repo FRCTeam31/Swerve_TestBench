@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -41,7 +43,7 @@ public class Drivetrain extends SubsystemBase {
     // drive and steering motors
 
     // Build a gyro and a kinematics class for our drive
-    final ADXRS450_Gyro mGyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+    final AHRS mGyro = new AHRS(Port.kUSB1);
 
     final SwerveDriveKinematics mKinematics = new SwerveDriveKinematics(
             frontLeftLocation,

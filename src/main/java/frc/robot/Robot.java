@@ -40,4 +40,9 @@ public class Robot extends TimedRobot {
         // TODO: Reset gyro
 
     }
+
+    @Override
+    public void autonomousPeriodic() {
+        CommandScheduler.getInstance().run();
+    }
 }

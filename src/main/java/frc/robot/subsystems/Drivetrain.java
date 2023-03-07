@@ -115,6 +115,17 @@ public class Drivetrain extends SubsystemBase {
         RearRightSwerveModule.setDesiredState(swerveModuleStates[3]);
     }
 
+    public void drive(ChassisSpeeds desiredChassisSpeeds) {
+        var swerveModuleStates = mKinematics.toSwerveModuleStates(desiredChassisSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveMap.kDriveMaxSpeedMetersPerSecond);
+
+        FrontLeftSwerveModule.setDesiredState(swerveModuleStates[0]);
+        FrontRightSwerveModule.setDesiredState(swerveModuleStates[1]);
+        RearLeftSwerveModule.setDesiredState(swerveModuleStates[2]);
+        RearRightSwerveModule.setDesiredState(swerveModuleStates[3]);
+
+    }
+
     public void toggleDriveShifter() {
         mDriveShifter = !mDriveShifter;
         System.out.println("[DRIVE] shifter");
@@ -122,5 +133,14 @@ public class Drivetrain extends SubsystemBase {
 
     public boolean getDriveShifted() {
         return mDriveShifter;
+
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        mOdometry.resetPosition(null, null, pose);
+    }
+
+    public Pose2d getPose() {
+        return mOdometry.getPoseMeters();
     }
 }

@@ -4,9 +4,16 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.SwerveModule;
@@ -29,5 +36,17 @@ public class DriveCommands {
 
     public static Command shiftDriveSpeedCommand(Drivetrain driveTrain) {
         return Commands.runOnce(() -> driveTrain.toggleDriveShifter(), driveTrain);
+    }
+
+    public static Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath,
+            Drivetrain drivetrain) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    if (isFirstPath) {
+                        drivetrain.resetOdometry(traj.getInitialHolonomicPose());
+                    }
+                }), new PPSwerveControllerCommand(traj, drivetrain::getPose, new PIDController(0, 0, 0),
+                        new PIDController(0, 0, 0), new PIDController(0, 0, 0), null, drivetrain));
+
     }
 }

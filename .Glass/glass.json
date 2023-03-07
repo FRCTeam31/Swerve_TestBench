@@ -6,9 +6,18 @@
     "Retained Values": {
       "open": false
     },
+    "transitory": {
+      "FMSInfo": {
+        "open": true
+      }
+    },
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/FrontLeft steering PID": "PIDController",
+      "/SmartDashboard/FrontRight steering PID": "PIDController",
+      "/SmartDashboard/RearLeft steering PID": "PIDController",
+      "/SmartDashboard/RearRight steering PID": "PIDController"
     },
     "windows": {
       "/FMSInfo": {

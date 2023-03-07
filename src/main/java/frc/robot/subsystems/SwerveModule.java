@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.config.DriveMap;
 import frc.robot.prime.utilities.CTREConverter;
@@ -26,12 +27,15 @@ public class SwerveModule extends PIDSubsystem {
     public MA3Encoder mEncoder;
 
     public SwerveModule(
+            String name,
             int driveMotorId,
             int steeringMotorId,
             int encoderAioChannel,
-            int encoderBasePositionOffset) {
+            int encoderBasePositionOffset,
+            boolean invertDriveMotor) {
         super(new PIDController(DriveMap.kSteeringPidConstants.kP, DriveMap.kSteeringPidConstants.kI,
                 DriveMap.kSteeringPidConstants.kD));
+        SmartDashboard.putData(name + " steering PID", getController());
 
         // Set up the steering motor
         mSteeringMotor = new LazyWPITalonFX(steeringMotorId);
@@ -43,13 +47,13 @@ public class SwerveModule extends PIDSubsystem {
 
         // Set up the drive motor
         mDriveMotor = new LazyWPITalonFX(driveMotorId);
-
         mDriveMotor.configFactoryDefault();
         mDriveMotor.clearStickyFaults();
+        mDriveMotor.setInverted(
+                invertDriveMotor ? TalonFXInvertType.CounterClockwise : TalonFXInvertType.CounterClockwise);
         mDriveMotor.setNeutralMode(NeutralMode.Brake);
         mDriveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor); // The integrated sensor in the
                                                                                    // Falcon
-                                                                                   // is the falcon's encoder
         mDriveMotor.configOpenloopRamp(0.2);
         mDriveMotor.setInverted(TalonFXInvertType.Clockwise);
 
@@ -109,7 +113,8 @@ public class SwerveModule extends PIDSubsystem {
 
     @Override
     protected void useOutput(double output, double setpoint) {
-        mSteeringMotor.set(ControlMode.PercentOutput, MathUtil.clamp(-output, -1, 1));
+
+        mSteeringMotor.set(ControlMode.PercentOutput, MathUtil.applyDeadband(MathUtil.clamp(-output, -1, 1), 0.2));
     }
 
     @Override

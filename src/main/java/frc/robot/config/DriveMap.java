@@ -3,6 +3,9 @@ package frc.robot.config;
 import frc.robot.prime.models.PidConstants;
 
 public class DriveMap {
+
+    public static final double degresToRobotDegrees = 57.28888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888;
+
     public static final double kRobotTrackWidthInches = 24.5;
     public static final double kRobotTrackWidthMeters = 0.6223;
     public static final double kRobotWheelBaseInches = 24;
@@ -20,7 +23,7 @@ public class DriveMap {
     public static final double driveKp = 0.0016983;
     public static final PidConstants kDrivePidConstants = new PidConstants(driveKp);
 
-    public static final double steeringKp = 0.8;
+    public static final double steeringKp = 0.7;
     public static final double steeringKi = 0;
     public static final double steeringKd = 0;
     public static final PidConstants kSteeringPidConstants = new PidConstants(steeringKp, steeringKi, steeringKd);
@@ -41,7 +44,7 @@ public class DriveMap {
     public static int kRearRightSteeringMotorId = 14;
     public static int kRearRightDrivingMotorId = 15;
     public static int kRearRightEncoderAIOChannel = 2;
-    public static short kRearRightEncoderOffset = 1115 + 2048 - 46 + 1990 + 168;
+    public static short kRearRightEncoderOffset = 1115 + 2048 - 46 + 1990 + 168 + 2048;
 
     // RL
     public static int kRearLeftSteeringMotorId = 17;
@@ -57,18 +60,18 @@ public class DriveMap {
     public static final double kDriveMaxAngularSpeed = DriveMap.kRobotWheelBaseCircumference
             / kDriveMaxSpeedMetersPerSecond; // 180 degrees per second, half rotation
 
-    public static final double kDriveLowGearCoefficient = 0.1;
+    public static final double kDriveLowGearCoefficient = 0.4;
 
     // Drive Auton PID values
-    public static final byte kAutonDriveXKp = 0;
+    public static final byte kAutonDriveXKp = 1;
     public static final byte kAutonDriveXKi = 0;
     public static final byte kAutonDriveXKd = 0;
 
-    public static final byte kAutonDriveYKp = 0;
+    public static final byte kAutonDriveYKp = 1;
     public static final byte kAutonDriveYKi = 0;
     public static final byte kAutonDriveYKd = 0;
 
-    public static final byte kAutonRotationKp = 0;
+    public static final byte kAutonRotationKp = 1;
     public static final byte kAutonRotationKi = 0;
     public static final byte kAutonRotationKd = 0;
 

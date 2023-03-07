@@ -19,7 +19,7 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
 
     // Subsystems
-    private Drivetrain Drivetrain;
+    public Drivetrain Drivetrain;
     private IntakeSubsystem intakeSubsystem;
     private Flywheel Flywheel;
     private TurretRotation turretRotation;
@@ -28,31 +28,39 @@ public class RobotContainer {
 
     // Front Left
     public final SwerveModule FrontLeftSwerveModule = new SwerveModule(
+            "FrontLeft",
             DriveMap.kFrontLeftDrivingMotorId,
             DriveMap.kFrontLeftSteeringMotorId,
             DriveMap.kFrontLeftEncoderAIOChannel,
-            DriveMap.kFrontLeftEncoderOffset);
+            DriveMap.kFrontLeftEncoderOffset,
+            false);
 
     // Front Right
     public final SwerveModule FrontRightSwerveModule = new SwerveModule(
+            "FrontRight",
             DriveMap.kFrontRightDrivingMotorId,
             DriveMap.kFrontRightSteeringMotorId,
             DriveMap.kFrontRightEncoderAIOChannel,
-            DriveMap.kFrontRightEncoderOffset);
+            DriveMap.kFrontRightEncoderOffset,
+            false);
 
     // Rear Left
     public final SwerveModule RearLeftSwerveModule = new SwerveModule(
+            "RearLeft",
             DriveMap.kRearLeftDrivingMotorId,
             DriveMap.kRearLeftSteeringMotorId,
             DriveMap.kRearLeftEncoderAIOChannel,
-            DriveMap.kRearLeftEncoderOffset);
+            DriveMap.kRearLeftEncoderOffset,
+            false);
 
     // Rear Right
     public final SwerveModule RearRightSwerveModule = new SwerveModule(
+            "RearRight",
             DriveMap.kRearRightDrivingMotorId,
             DriveMap.kRearRightSteeringMotorId,
             DriveMap.kRearRightEncoderAIOChannel,
-            DriveMap.kRearRightEncoderOffset);
+            DriveMap.kRearRightEncoderOffset,
+            false);
 
     private CommandJoystick mController;
 
@@ -127,9 +135,12 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
+
+        Drivetrain.resetGyro();
         PathPlannerTrajectory driveForwardOneMeter = PathPlanner.loadPath("DriveForwardOneMeter",
-                new PathConstraints(1, 1));
+                new PathConstraints(0.1, 0.1));
         return DriveCommands.followTrajectoryWithEvent(Drivetrain, driveForwardOneMeter, true);
 
     }
+
 }

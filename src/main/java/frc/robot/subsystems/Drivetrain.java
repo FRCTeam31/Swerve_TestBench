@@ -4,8 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
-
+import frc.robot.sensors.navx.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -43,7 +42,7 @@ public class Drivetrain extends SubsystemBase {
     // drive and steering motors
 
     // Build a gyro and a kinematics class for our drive
-    final AHRS mGyro = new AHRS(Port.kUSB1);
+    final frc.robot.sensors.navx.AHRS mGyro = new AHRS(Port.kMXP);
 
     final SwerveDriveKinematics mKinematics = new SwerveDriveKinematics(
             frontLeftLocation,
@@ -64,7 +63,7 @@ public class Drivetrain extends SubsystemBase {
             SwerveModule RearLeftSwerveModule, SwerveModule RearRightSwerveModule) {
         SmartDashboard.putData("Field", mField);
         SwerveDriveOdometry mOdometry = new SwerveDriveOdometry(mKinematics,
-                mGyro.getRotation2d(),
+                getNavxInvertedRotation2d(),
                 new SwerveModulePosition[] {
                         FrontLeftSwerveModule.getPosition(),
                         FrontRightSwerveModule.getPosition(),
@@ -84,7 +83,7 @@ public class Drivetrain extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        var gyroAngle = mGyro.getRotation2d();
+        var gyroAngle = getNavxInvertedRotation2d();
         SmartDashboard.putNumber("Drivetrain gyro angle", gyroAngle.getDegrees());
         SmartDashboard.putNumber("Front Left Encoder Angle", FrontLeftSwerveModule.mEncoder.getRawValue());
         SmartDashboard.putNumber("Front Right Encoder Angle", FrontRightSwerveModule.mEncoder.getRawValue());
@@ -111,7 +110,7 @@ public class Drivetrain extends SubsystemBase {
         }
 
         var desiredChassisSpeeds = fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, mGyro.getRotation2d())
+                ? ChassisSpeeds.fromFieldRelativeSpeeds(strafe, forward, rotation, getNavxInvertedRotation2d())
                 : new ChassisSpeeds(strafe, forward, rotation);
 
         drive(desiredChassisSpeeds);
@@ -147,7 +146,11 @@ public class Drivetrain extends SubsystemBase {
         swerveModules[2] = RearLeftSwerveModule.getPosition();
         swerveModules[3] = RearRightSwerveModule.getPosition();
 
-        mOdometry.resetPosition(mGyro.getRotation2d(), swerveModules, getPose());
+        mOdometry.resetPosition(getNavxInvertedRotation2d(), swerveModules, getPose());
     }
 
+    private Rotation2d getNavxInvertedRotation2d() {
+        return Rotation2d.fromRadians(-mGyro.getYaw()
+                / DriveMap.degresToRobotDegrees);
+    }
 }

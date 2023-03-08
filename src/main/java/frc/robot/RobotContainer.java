@@ -138,7 +138,7 @@ public class RobotContainer {
 
         Drivetrain.resetGyro();
         PathPlannerTrajectory driveForwardOneMeter = PathPlanner.loadPath("DriveForwardOneMeter",
-                new PathConstraints(0.1, 0.1));
+                new PathConstraints(0.1, 0.01));
         return DriveCommands.followTrajectoryWithEvent(Drivetrain, driveForwardOneMeter, true);
 
     }

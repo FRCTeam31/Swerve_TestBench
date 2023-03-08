@@ -136,7 +136,6 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
 
-        Drivetrain.resetGyro();
         PathPlannerTrajectory driveForwardOneMeter = PathPlanner.loadPath("DriveForwardOneMeter",
                 new PathConstraints(0.1, 0.01));
         return DriveCommands.followTrajectoryWithEvent(Drivetrain, driveForwardOneMeter, true);
